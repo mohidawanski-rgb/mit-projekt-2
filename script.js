@@ -129,6 +129,11 @@ if (validReviews.length) {
 // Åbner kundens mailprogram med en færdigudfyldt mail. Skift modtager her:
 const contactEmail = 'mohidawanski@gmail.com';
 const quoteForm = document.getElementById('quote-form');
+document.querySelectorAll('[data-produkt]').forEach(card => card.addEventListener('click', () => {
+  const select = document.getElementById('product-select');
+  const option = [...select.options].find(o => o.textContent === card.dataset.produkt);
+  if (option) select.value = option.value;
+}));
 const formStatus = document.getElementById('form-status');
 quoteForm.addEventListener('submit', event => {
   event.preventDefault();
@@ -138,6 +143,7 @@ quoteForm.addEventListener('submit', event => {
     `Navn: ${data.get('name')}`,
     `Telefon: ${data.get('phone') || '-'}`,
     `E-mail: ${data.get('email')}`,
+    `Emne: ${data.get('product') || '-'}`,
     '',
     String(data.get('message')),
     '',
