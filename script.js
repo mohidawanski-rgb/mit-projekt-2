@@ -13,13 +13,7 @@ const reviewPlatformUrl = '';
 // ---------- Hjælpere ----------
 const $ = (selector, root = document) => root.querySelector(selector);
 const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
-
-// ---------- Billedpladser: vis pladsholder hvis billedet mangler ----------
-$$('.ph img').forEach(img => {
-  const mark = () => img.parentElement.classList.add('empty');
-  if (img.complete && img.naturalWidth === 0) mark();
-  img.addEventListener('error', mark);
-});
+document.documentElement.classList.add('js');
 
 // ---------- Menu ----------
 const menuToggle = $('.menu-toggle');
@@ -50,72 +44,39 @@ subMenus.forEach(menu => {
     menu.classList.toggle('open', open);
     toggle.setAttribute('aria-expanded', String(open));
   });
-  $$('.sub a', menu).forEach(link => link.addEventListener('click', () => closeSubMenus()));
 });
 document.addEventListener('click', () => closeSubMenus());
 document.addEventListener('keydown', event => {
   if (event.key !== 'Escape') return;
   closeSubMenus();
   setMenu(false);
-  setSearch(false);
 });
 
-// Aktivt menupunkt ved scroll
-const navLinks = $$('.desktop-nav > a');
-const sectionIds = ['top', 'galleri', 'om-os', 'kontakt'];
+// ---------- Animation ved scroll ----------
+const revealItems = $$('.reveal');
 if ('IntersectionObserver' in window) {
   const observer = new IntersectionObserver(entries => {
     entries.forEach(entry => {
       if (!entry.isIntersecting) return;
-      navLinks.forEach(a => a.classList.toggle('active', a.getAttribute('href') === `#${entry.target.id}`));
+      entry.target.classList.add('in');
+      observer.unobserve(entry.target);
     });
-  }, {rootMargin: '-45% 0px -50% 0px'});
-  sectionIds.map(id => document.getElementById(id)).filter(Boolean).forEach(el => observer.observe(el));
+  }, {rootMargin: '0px 0px -8% 0px', threshold: 0.05});
+  revealItems.forEach(el => observer.observe(el));
+} else {
+  revealItems.forEach(el => el.classList.add('in'));
 }
 
-// ---------- Søgning i produkter ----------
-const searchToggle = $('.search-toggle');
-const searchbar = $('#searchbar');
-const searchInput = $('#site-search');
-const searchEmpty = $('#search-empty');
-const productCards = $$('.product-card');
-function setSearch(open) {
-  searchToggle.setAttribute('aria-expanded', String(open));
-  searchbar.hidden = !open;
-  if (open) searchInput.focus();
-  else { searchInput.value = ''; filterProducts(''); }
-}
-function filterProducts(query) {
-  const q = query.trim().toLowerCase();
-  let shown = 0;
-  productCards.forEach(card => {
-    const match = !q || card.textContent.toLowerCase().includes(q) || (card.dataset.produkt || '').toLowerCase().includes(q);
-    card.hidden = !match;
-    if (match) shown++;
-  });
-  searchEmpty.hidden = !q || shown > 0;
-}
-searchToggle.addEventListener('click', () => setSearch(searchbar.hidden));
-searchInput.addEventListener('input', () => {
-  filterProducts(searchInput.value);
-  if (searchInput.value.trim()) $('#produkter').scrollIntoView({behavior: 'smooth', block: 'start'});
-});
-
-// ---------- Galleri ----------
-const gallery = $('#gallery-track');
-$('.gallery-arrow.prev').addEventListener('click', () => gallery.scrollBy({left: -gallery.clientWidth * .8, behavior: 'smooth'}));
-$('.gallery-arrow.next').addEventListener('click', () => gallery.scrollBy({left: gallery.clientWidth * .8, behavior: 'smooth'}));
-gallery.addEventListener('keydown', event => {
-  if (event.key === 'ArrowRight') gallery.scrollBy({left: gallery.clientWidth * .4, behavior: 'smooth'});
-  if (event.key === 'ArrowLeft') gallery.scrollBy({left: -gallery.clientWidth * .4, behavior: 'smooth'});
-});
+// ---------- FAQ: kun ét spørgsmål åbent ad gangen ----------
+const faqItems = $$('.faq-list details');
+faqItems.forEach(item => item.addEventListener('toggle', () => {
+  if (item.open) faqItems.forEach(other => { if (other !== item) other.open = false; });
+}));
 
 // ---------- Anmeldelser ----------
 const validReviews = reviews.filter(review => review.text && review.name
   && Number.isInteger(review.stars) && review.stars >= 1 && review.stars <= 5);
 const reviewSection = $('#anmeldelser');
-const reviewTrack = $('#review-track');
-const ratingLink = $('#rating-link');
 
 function createReviewCard(review) {
   const card = document.createElement('article');
@@ -139,7 +100,9 @@ function createReviewCard(review) {
   return card;
 }
 
-if (validReviews.length) {
+if (reviewSection && validReviews.length) {
+  const reviewTrack = $('#review-track');
+  const ratingLink = $('#rating-link');
   reviewSection.hidden = false;
   const average = validReviews.reduce((sum, r) => sum + r.stars, 0) / validReviews.length;
   $('.avg', ratingLink).textContent = `${average.toLocaleString('da-DK', {maximumFractionDigits: 1})} ud af 5`;
@@ -152,7 +115,7 @@ if (validReviews.length) {
   const viewport = $('.review-viewport');
   const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
   let offset = 0, lastTime = 0, paused = false;
-  const gap = 12;
+  const gap = 16;
   const cardStep = () => $('.review-card', reviewTrack).getBoundingClientRect().width + gap;
   const groupWidth = () => cardStep() * validReviews.length;
   const draw = () => { reviewTrack.style.transform = `translate3d(${-offset}px,0,0)`; };
@@ -197,34 +160,33 @@ if (validReviews.length) {
 
 // ---------- Kontaktformular (åbner kundens mailprogram) ----------
 const quoteForm = $('#quote-form');
-const formStatus = $('#form-status');
-const productSelect = $('#product-select');
+if (quoteForm) {
+  const formStatus = $('#form-status');
+  const productSelect = $('#product-select');
+  const wanted = new URLSearchParams(window.location.search).get('produkt');
+  if (wanted && [...productSelect.options].some(o => o.value === wanted)) productSelect.value = wanted;
 
-// Klik på et produkt vælger emnet i formularen
-$$('[data-produkt]').forEach(el => el.addEventListener('click', () => {
-  const wanted = el.dataset.produkt;
-  const option = [...productSelect.options].find(o => o.value === wanted || o.textContent === wanted);
-  if (option) productSelect.value = option.value;
-}));
-
-quoteForm.addEventListener('submit', event => {
-  event.preventDefault();
-  if (!quoteForm.reportValidity()) return;
-  const data = new FormData(quoteForm);
-  const body = [
-    `Navn: ${data.get('name')}`,
-    `Telefon: ${data.get('phone') || '-'}`,
-    `E-mail: ${data.get('email')}`,
-    `Emne: ${data.get('product') || '-'}`,
-    '',
-    String(data.get('message')),
-    '',
-    '(Husk at vedhæfte logo eller filer til denne mail)'
-  ].join('\n');
-  const subject = `Tilbudsforespørgsel fra ${data.get('name')}`;
-  window.location.href = `mailto:${contactEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-  formStatus.textContent = 'Din mail er klar i dit mailprogram. Tryk send der, og vedhæft gerne logo eller filer.';
-});
+  quoteForm.addEventListener('submit', event => {
+    event.preventDefault();
+    if (!quoteForm.reportValidity()) return;
+    const data = new FormData(quoteForm);
+    const subjectOption = productSelect.options[productSelect.selectedIndex];
+    const body = [
+      `Navn: ${data.get('name')}`,
+      `Telefon: ${data.get('phone') || '-'}`,
+      `E-mail: ${data.get('email')}`,
+      `Emne: ${data.get('product') ? subjectOption.textContent : '-'}`,
+      '',
+      String(data.get('message')),
+      '',
+      '(Husk at vedhæfte logo eller filer til denne mail)'
+    ].join('\n');
+    const subject = `Tilbudsforespørgsel fra ${data.get('name')}`;
+    window.location.href = `mailto:${contactEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    formStatus.textContent = 'Din mail er klar i dit mailprogram. Tryk send der, og vedhæft gerne logo eller filer.';
+  });
+}
 
 // ---------- År i footer ----------
-$('#year').textContent = String(new Date().getFullYear());
+const year = $('#year');
+if (year) year.textContent = String(new Date().getFullYear());

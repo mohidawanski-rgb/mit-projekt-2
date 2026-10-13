@@ -1,22 +1,28 @@
 # Skiltefabrikken – hjemmeside
 
-Statisk hjemmeside (HTML, CSS, JavaScript). Ingen build-proces eller framework.
+Flersidet statisk hjemmeside (HTML, CSS, JavaScript). Ingen framework og ingen build-proces ved hosting.
+
+## Sider
+`index.html` (forside) · `skilte.html` · `folie.html` · `print-og-events.html` · `design-og-special.html` · `galleri.html` · `om-os.html` · `kontakt.html` · `privatlivspolitik.html` · `handelsbetingelser.html` · `cookies.html`
 
 ## Sådan kommer du i gang
-1. Upload `index.html`, `style.css`, `script.js`, de tre juridiske sider og mappen `assets/` til dit webhotel (typisk `public_html`).
+1. Upload alle `.html`-filer, `style.css`, `script.js` og mappen `assets/` til dit webhotel (typisk `public_html`).
 2. Åbn domænet i browseren.
 
+## Rediger indhold
+Siderne er genereret af `tools/build.py`. Tekster, produkter, FAQ og menu står øverst i scriptet. Efter ændringer kører du `python3 tools/build.py`, og de nye `.html`-filer skrives i projektets rod. Scriptet er ikke nødvendigt på webhotellet.
+
 ## Billeder
-Siden har faste billedpladser. Læg dine egne fotos i `assets/img/` med de filnavne, der står i `assets/img/README.md` (fx `hero.jpg`, `produkt-facade.jpg`, `galleri-1.jpg`). Mangler en fil, vises en pladsholder.
+Billederne er illustrationsfotos fra Unsplash (de samme som i de oprindelige filer), hentet direkte fra Unsplash. De er ikke rigtige Skiltefabrikken-projekter. Udskift dem med egne fotos i `tools/build.py` (listen `IMG`, brug en lokal sti i stedet for Unsplash-adressen) før lancering.
 
 ## Kontaktformular
-Formularen åbner kundens mailprogram med en færdig mail til adressen i `contactEmail` øverst i `script.js` (nu `mohidawanski@gmail.com`). Skift den til firmamailen før lancering. Filer kan ikke vedhæftes automatisk, så kunden bliver bedt om at vedhæfte dem i mailen.
+Formularen på `kontakt.html` åbner kundens mailprogram med en færdig mail til adressen i `contactEmail` øverst i `script.js` (nu `mohidawanski@gmail.com`). Skift den til firmamailen før lancering. Filer kan ikke vedhæftes automatisk, så kunden bliver bedt om at vedhæfte dem i mailen.
 
 ## Før lancering
-- Kontroller telefon (`+45 44 11 94 91`) og e-mail (`info@skiltefabrikken.dk`) i `index.html`.
-- Tilføj adresse og CVR i footeren, når de er klar.
+- Kontroller telefon (`+45 44 11 94 91`) og e-mail (`info@skiltefabrikken.dk`).
+- Tilføj adresse og CVR i footeren, når de er klar (i `tools/build.py`).
 - Få privatlivspolitik, handelsbetingelser og cookies gennemgået (de er standardskabeloner).
-- Anmeldelser: udfyld `reviews` i `script.js` med **rigtige** udtalelser. Sektionen er skjult, til der er mindst én. Fra to anmeldelser ruller den automatisk.
+- Anmeldelser: udfyld `reviews` i `script.js` med **rigtige** udtalelser. Sektionen på forsiden er skjult, til der er mindst én.
 - Test på mobil, tablet og computer.
 
 ## Designfarver
