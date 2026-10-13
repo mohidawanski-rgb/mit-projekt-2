@@ -1,32 +1,50 @@
 'use strict';
 
-// ---------- Indstillinger ----------
-// Tilbudsforespørgsler sendes til denne adresse (åbner kundens mailprogram).
+/* ==========================================================================
+   INDSTILLINGER
+   ========================================================================== */
+// Hvor tilbudsforespørgsler sendes hen, når der ikke er en formularmodtager (se nedenfor).
 const contactEmail = 'mohidawanski@gmail.com';
 
-// Anmeldelser: indsæt kun rigtige. Sektionen vises først, når der er mindst én.
-// Eksempel: { text: 'Virkelig flot arbejde!', stars: 5, name: 'Anna', company: 'Firma ApS', logo: 'assets/firma-logo.png' }
-const reviews = [];
+// RIGTIG AFSENDELSE (anbefalet): opret en gratis formular hos fx Formspree (formspree.io)
+// og indsæt adressen her, fx 'https://formspree.io/f/xxxxxxxx'. Så sendes forespørgslen
+// direkte – også med vedhæftede filer (hvis jeres abonnement understøtter det).
+// Er feltet tomt, åbnes i stedet kundens mailprogram med en færdig mail til contactEmail.
+const formEndpoint = '';
+
+// ANMELDELSER – plads til 20. Skriv kun rigtige anmeldelser. Sektionen vises først, når der er mindst én.
+// Tilføj fx:
+//   {text: 'Virkelig flot arbejde!', stars: 5, name: 'Anna Jensen', company: 'Firma ApS', logo: 'assets/firma-logo.png'},
+// "logo" er valgfrit. "stars" er et heltal fra 1 til 5.
+const reviews = [
+];
 // Link til jeres egen Google-/Trustpilot-side (valgfrit).
 const reviewPlatformUrl = '';
+const MAX_REVIEWS = 20;
 
-// ---------- Hjælpere ----------
+/* ==========================================================================
+   HJÆLPERE
+   ========================================================================== */
 const $ = (selector, root = document) => root.querySelector(selector);
 const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
 document.documentElement.classList.add('js');
 
-// ---------- Menu ----------
+/* ---------- Menu ---------- */
 const menuToggle = $('.menu-toggle');
 const mobileNav = $('#mobile-nav');
 function setMenu(open) {
+  if (!menuToggle || !mobileNav) return;
   menuToggle.setAttribute('aria-expanded', String(open));
   menuToggle.setAttribute('aria-label', open ? 'Luk menu' : 'Åbn menu');
   mobileNav.hidden = !open;
 }
-menuToggle.addEventListener('click', () => setMenu(menuToggle.getAttribute('aria-expanded') !== 'true'));
-$$('a', mobileNav).forEach(link => link.addEventListener('click', () => setMenu(false)));
+if (menuToggle) {
+  menuToggle.addEventListener('click', () => setMenu(menuToggle.getAttribute('aria-expanded') !== 'true'));
+  $$('a', mobileNav).forEach(link => link.addEventListener('click', () => setMenu(false)));
+  window.addEventListener('resize', () => { if (window.innerWidth > 1020) setMenu(false); });
+}
 
-// Undermenuer (hover på computer, tryk på mobil/tastatur)
+/* ---------- Undersmenuer (hover på computer, tryk på mobil/tastatur) ---------- */
 const subMenus = $$('.has-sub');
 function closeSubMenus(except) {
   subMenus.forEach(menu => {
@@ -52,30 +70,126 @@ document.addEventListener('keydown', event => {
   setMenu(false);
 });
 
-// ---------- Animation ved scroll ----------
-const revealItems = $$('.reveal');
-if ('IntersectionObserver' in window) {
-  const observer = new IntersectionObserver(entries => {
-    entries.forEach(entry => {
-      if (!entry.isIntersecting) return;
-      entry.target.classList.add('in');
-      observer.unobserve(entry.target);
-    });
-  }, {rootMargin: '0px 0px -8% 0px', threshold: 0.05});
-  revealItems.forEach(el => observer.observe(el));
-} else {
-  revealItems.forEach(el => el.classList.add('in'));
+/* ---------- Animation ved scroll ---------- */
+function setupReveal() {
+  const items = $$('.reveal:not(.in)');
+  if ('IntersectionObserver' in window) {
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add('in');
+        observer.unobserve(entry.target);
+      });
+    }, {rootMargin: '0px 0px -6% 0px', threshold: 0.04});
+    items.forEach(el => observer.observe(el));
+  } else {
+    items.forEach(el => el.classList.add('in'));
+  }
 }
+setupReveal();
 
-// ---------- FAQ: kun ét spørgsmål åbent ad gangen ----------
+/* ---------- FAQ: kun ét spørgsmål åbent ad gangen ---------- */
 const faqItems = $$('.faq-list details');
 faqItems.forEach(item => item.addEventListener('toggle', () => {
   if (item.open) faqItems.forEach(other => { if (other !== item) other.open = false; });
 }));
 
-// ---------- Anmeldelser ----------
-const validReviews = reviews.filter(review => review.text && review.name
-  && Number.isInteger(review.stars) && review.stars >= 1 && review.stars <= 5);
+/* ==========================================================================
+   GALLERI (data hentes fra gallery-data.js)
+   ========================================================================== */
+const galleryItems = window.GALLERY_ITEMS || [];
+const galleryCategories = window.GALLERY_CATEGORIES || {};
+const hasLightbox = $('#gallery-track') || $('#gallery-grid');
+let lightbox = null;
+
+function createGalleryCard(item) {
+  const figure = document.createElement('figure');
+  figure.className = 'gallery-card';
+  figure.dataset.category = item.category;
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.className = 'gallery-open';
+  button.setAttribute('aria-label', `Forstør billede: ${item.title}`);
+  const frame = document.createElement('span');
+  frame.className = 'ph corners';
+  frame.style.aspectRatio = '4 / 5';
+  const img = document.createElement('img');
+  img.src = item.src; img.alt = item.alt || item.title; img.loading = 'lazy'; img.decoding = 'async';
+  img.referrerPolicy = 'no-referrer';
+  frame.append(img); button.append(frame);
+  const caption = document.createElement('figcaption');
+  const title = document.createElement('strong'); title.textContent = item.title;
+  const sub = document.createElement('small');
+  sub.textContent = item.example ? `Eksempelbillede · ${galleryCategories[item.category] || ''}` : (galleryCategories[item.category] || '');
+  caption.append(title, sub);
+  figure.append(button, caption);
+  button.addEventListener('click', () => openLightbox(item));
+  return figure;
+}
+
+function openLightbox(item) {
+  if (!lightbox) {
+    lightbox = document.createElement('dialog');
+    lightbox.className = 'lightbox';
+    lightbox.setAttribute('aria-label', 'Forstørret billede');
+    lightbox.innerHTML = '<button type="button" class="lightbox-close" aria-label="Luk billede"><svg class="ic" aria-hidden="true"><use href="assets/icons.svg#i-close"/></svg></button><figure><img alt=""><figcaption></figcaption></figure>';
+    document.body.append(lightbox);
+    $('.lightbox-close', lightbox).addEventListener('click', () => lightbox.close());
+    lightbox.addEventListener('click', event => { if (event.target === lightbox) lightbox.close(); });
+  }
+  const img = $('img', lightbox);
+  img.src = item.src.replace('w=800', 'w=1600'); img.alt = item.alt || item.title;
+  $('figcaption', lightbox).textContent = item.example ? `${item.title} – eksempelbillede, ikke et udført projekt` : item.title;
+  if (typeof lightbox.showModal === 'function') lightbox.showModal();
+}
+
+// Karrusel på forsiden
+const galleryTrack = $('#gallery-track');
+if (galleryTrack) {
+  galleryItems.slice(0, 8).forEach(item => galleryTrack.append(createGalleryCard(item)));
+  const scrollBy = direction => {
+    const card = $('.gallery-card', galleryTrack);
+    const step = card ? card.getBoundingClientRect().width + 14 : galleryTrack.clientWidth * .8;
+    galleryTrack.scrollBy({left: direction * step * 2, behavior: 'smooth'});
+  };
+  $('.gallery-arrow.prev').addEventListener('click', () => scrollBy(-1));
+  $('.gallery-arrow.next').addEventListener('click', () => scrollBy(1));
+  galleryTrack.addEventListener('keydown', event => {
+    if (event.key === 'ArrowRight') scrollBy(.5);
+    if (event.key === 'ArrowLeft') scrollBy(-.5);
+  });
+}
+
+// Galleriside med kategorifiltre
+const galleryGrid = $('#gallery-grid');
+if (galleryGrid) {
+  const filters = $('#gallery-filters');
+  const cards = galleryItems.map(createGalleryCard);
+  cards.forEach(card => galleryGrid.append(card));
+  const used = [...new Set(galleryItems.map(i => i.category))];
+  const makeButton = (key, label) => {
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'filter-btn'; b.dataset.filter = key; b.textContent = label;
+    b.setAttribute('aria-pressed', key === 'alle' ? 'true' : 'false');
+    filters.append(b);
+  };
+  makeButton('alle', 'Alle');
+  used.forEach(key => makeButton(key, galleryCategories[key] || key));
+  filters.addEventListener('click', event => {
+    const button = event.target.closest('.filter-btn');
+    if (!button) return;
+    $$('.filter-btn', filters).forEach(b => b.setAttribute('aria-pressed', String(b === button)));
+    const key = button.dataset.filter;
+    cards.forEach(card => { card.hidden = key !== 'alle' && card.dataset.category !== key; });
+  });
+}
+
+/* ==========================================================================
+   ANMELDELSER
+   ========================================================================== */
+const validReviews = reviews
+  .filter(review => review && review.text && review.name && Number.isInteger(review.stars) && review.stars >= 1 && review.stars <= 5)
+  .slice(0, MAX_REVIEWS);
 const reviewSection = $('#anmeldelser');
 
 function createReviewCard(review) {
@@ -115,7 +229,7 @@ if (reviewSection && validReviews.length) {
   const viewport = $('.review-viewport');
   const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
   let offset = 0, lastTime = 0, paused = false;
-  const gap = 16;
+  const gap = 14;
   const cardStep = () => $('.review-card', reviewTrack).getBoundingClientRect().width + gap;
   const groupWidth = () => cardStep() * validReviews.length;
   const draw = () => { reviewTrack.style.transform = `translate3d(${-offset}px,0,0)`; };
@@ -158,35 +272,89 @@ if (reviewSection && validReviews.length) {
   document.addEventListener('visibilitychange', () => { lastTime = 0; });
 }
 
-// ---------- Kontaktformular (åbner kundens mailprogram) ----------
+/* ==========================================================================
+   KONTAKTFORMULAR
+   ========================================================================== */
 const quoteForm = $('#quote-form');
 if (quoteForm) {
   const formStatus = $('#form-status');
   const productSelect = $('#product-select');
-  const wanted = new URLSearchParams(window.location.search).get('produkt');
-  if (wanted && [...productSelect.options].some(o => o.value === wanted)) productSelect.value = wanted;
+  const fileInput = $('#file-input');
+  const fileList = $('#file-list');
+  const dropZone = $('.upload-field', quoteForm);
+  const MAX_TOTAL_MB = 10;
 
-  quoteForm.addEventListener('submit', event => {
+  // Emnet kan forudvælges fra et produktkort: kontakt.html?produkt=facadeskilte
+  const wanted = new URLSearchParams(window.location.search).get('produkt');
+  if (wanted && productSelect && [...productSelect.options].some(o => o.value === wanted)) productSelect.value = wanted;
+
+  const say = (text, kind = '') => { formStatus.textContent = text; formStatus.className = kind; };
+  const fileIcon = '<svg class="ic" aria-hidden="true"><use href="assets/icons.svg#i-check"/></svg>';
+  function showFiles() {
+    fileList.innerHTML = '';
+    [...fileInput.files].forEach(file => {
+      const li = document.createElement('li');
+      li.innerHTML = fileIcon;
+      li.append(`${file.name} (${(file.size / 1024 / 1024).toFixed(1)} MB)`);
+      fileList.append(li);
+    });
+  }
+  fileInput.addEventListener('change', showFiles);
+  ['dragenter', 'dragover'].forEach(type => dropZone.addEventListener(type, event => { event.preventDefault(); dropZone.classList.add('drag'); }));
+  ['dragleave', 'drop'].forEach(type => dropZone.addEventListener(type, event => { event.preventDefault(); dropZone.classList.remove('drag'); }));
+  dropZone.addEventListener('drop', event => {
+    if (event.dataTransfer && event.dataTransfer.files.length && typeof DataTransfer === 'function') {
+      const transfer = new DataTransfer();
+      [...fileInput.files, ...event.dataTransfer.files].forEach(f => transfer.items.add(f));
+      fileInput.files = transfer.files;
+      showFiles();
+    }
+  });
+
+  quoteForm.addEventListener('submit', async event => {
     event.preventDefault();
     if (!quoteForm.reportValidity()) return;
     const data = new FormData(quoteForm);
-    const subjectOption = productSelect.options[productSelect.selectedIndex];
-    const body = [
+    if (data.get('_gotcha')) return; // spam-felt (skjult) er udfyldt
+    const files = [...fileInput.files];
+    const totalMb = files.reduce((sum, f) => sum + f.size, 0) / 1024 / 1024;
+    if (totalMb > MAX_TOTAL_MB) { say(`Filerne er for store (${totalMb.toFixed(1)} MB). Maks. ${MAX_TOTAL_MB} MB i alt.`, 'err'); return; }
+    const subjectOption = productSelect ? productSelect.options[productSelect.selectedIndex] : null;
+    const topic = data.get('product') && subjectOption ? subjectOption.textContent : '';
+
+    if (formEndpoint) {
+      const submit = $('[type=submit]', quoteForm);
+      submit.disabled = true; say('Sender forespørgsel …');
+      try {
+        data.set('Emne', topic || '-');
+        const response = await fetch(formEndpoint, {method: 'POST', body: data, headers: {Accept: 'application/json'}});
+        if (!response.ok) throw new Error('Afsendelse mislykkedes');
+        say('Tak! Din forespørgsel er sendt. Vi vender tilbage hurtigst muligt.', 'ok');
+        quoteForm.reset(); showFiles();
+      } catch (error) {
+        say('Der opstod en fejl. Prøv igen, eller skriv til os på e-mail.', 'err');
+      } finally { submit.disabled = false; }
+      return;
+    }
+
+    // Uden formularmodtager: åbn kundens mailprogram med en færdig mail.
+    const lines = [
       `Navn: ${data.get('name')}`,
       `Telefon: ${data.get('phone') || '-'}`,
       `E-mail: ${data.get('email')}`,
-      `Emne: ${data.get('product') ? subjectOption.textContent : '-'}`,
-      '',
-      String(data.get('message')),
-      '',
-      '(Husk at vedhæfte logo eller filer til denne mail)'
-    ].join('\n');
+      `Emne: ${topic || '-'}`,
+      '', String(data.get('message')), ''
+    ];
+    if (files.length) lines.push(`Filer jeg vedhæfter manuelt: ${files.map(f => f.name).join(', ')}`);
+    else lines.push('(Husk at vedhæfte logo eller billeder, hvis du har dem.)');
     const subject = `Tilbudsforespørgsel fra ${data.get('name')}`;
-    window.location.href = `mailto:${contactEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    formStatus.textContent = 'Din mail er klar i dit mailprogram. Tryk send der, og vedhæft gerne logo eller filer.';
+    window.location.href = `mailto:${contactEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(lines.join('\n'))}`;
+    say(files.length
+      ? 'Din mail er klar i dit mailprogram. Vedhæft de valgte filer dér, og tryk send.'
+      : 'Din mail er klar i dit mailprogram. Tryk send der, og vedhæft gerne logo eller billeder.', 'ok');
   });
 }
 
-// ---------- År i footer ----------
+/* ---------- År i footer ---------- */
 const year = $('#year');
 if (year) year.textContent = String(new Date().getFullYear());
