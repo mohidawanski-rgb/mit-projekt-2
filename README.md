@@ -1,29 +1,27 @@
 # Skiltefabrikken – hjemmeside
 
-## Installation
-1. Upload `index.html`, `style.css`, `script.js` og mappen `assets/` til dit webhotel (typisk `public_html`).
-2. Åbn domænet i browseren. Der kræves ingen build-proces eller framework.
-3. Billeder er **illustrationsfotos hentet fra Unsplash**, ikke faktiske Skiltefabrikken-projekter. Udskift alle billed-URL'er i `index.html` og hero-billedet i `style.css` med egne billeder før lancering. `assets/design-reference.png` er kun det originale referencebillede, ikke et web-asset.
-4. Logoet er en typografisk CSS-skitse. Udskift med virksomhedens originale SVG/PNG-logo.
-5. Indsæt rigtig adresse og CVR i `index.html`; kontroller e-mail og telefonlink.
-6. Indsæt korrekt link til privatlivspolitik, handelsbetingelser og cookieinformation.
-7. Kontaktformularen åbner kundens mailprogram og sender til `contactEmail` i `script.js` (nu mohidawanski@gmail.com – skift til firmamailen før lancering). Filer kan ikke vedhæftes automatisk.
-8. Anmeldelser: udfyld objekter i `reviews` i `script.js` med **ægte** kundeudtalelser. Alle 20 starter som pladsholdere og vises ikke. Angiv evt. `reviewPlatformUrl` til jeres verificerede Google/Trustpilot-side. Når mindst én anmeldelse er udfyldt, vises sektionen. Fra to anmeldelser ruller den automatisk; reduceret bevægelse respekteres.
-9. Test på mobil, tablet og computer før offentliggørelse.
+Statisk hjemmeside (HTML, CSS, JavaScript). Ingen build-proces eller framework.
+
+## Sådan kommer du i gang
+1. Upload `index.html`, `style.css`, `script.js`, de tre juridiske sider og mappen `assets/` til dit webhotel (typisk `public_html`).
+2. Åbn domænet i browseren.
+
+## Billeder
+Siden har faste billedpladser. Læg dine egne fotos i `assets/img/` med de filnavne, der står i `assets/img/README.md` (fx `hero.jpg`, `produkt-facade.jpg`, `galleri-1.jpg`). Mangler en fil, vises en pladsholder.
+
+## Kontaktformular
+Formularen åbner kundens mailprogram med en færdig mail til adressen i `contactEmail` øverst i `script.js` (nu `mohidawanski@gmail.com`). Skift den til firmamailen før lancering. Filer kan ikke vedhæftes automatisk, så kunden bliver bedt om at vedhæfte dem i mailen.
+
+## Før lancering
+- Kontroller telefon (`+45 44 11 94 91`) og e-mail (`info@skiltefabrikken.dk`) i `index.html`.
+- Tilføj adresse og CVR i footeren, når de er klar.
+- Få privatlivspolitik, handelsbetingelser og cookies gennemgået (de er standardskabeloner).
+- Anmeldelser: udfyld `reviews` i `script.js` med **rigtige** udtalelser. Sektionen er skjult, til der er mindst én. Fra to anmeldelser ruller den automatisk.
+- Test på mobil, tablet og computer.
 
 ## Designfarver
-- Primær blå: `#0866F5`
-- Hover-blå: `#0554D2`
-- Navy: `#061421`
-- Sekundær navy: `#071B2A`
-- Mørke kort: `#102333`
-- Hvid: `#FFFFFF`
-- Lys baggrund: `#F5F7FA`
-- Primær tekst: `#111827`
-- Sekundær tekst: `#526174`
-- Kant: `#E2E8F0`
-- Stjerner: `#F5B400`
-- Font: Inter (Google Fonts), fallback Arial/sans-serif.
-
-## Bemærkninger
-Dette er en selvstændig frontend baseret på et skærmbillede, ikke en pixelidentisk rekonstruktion af original kode. Karrusellen kræver mindst to ægte anmeldelser for automatisk bevægelse. Hero-foto og produktfotos er illustrative. Ingen opdigtede anmeldelser eller vurderinger vises.
+- Primær blå `#0866F5`, hover `#0554D2`
+- Navy `#061421`, sekundær navy `#071B2A`, mørke kort `#102333`
+- Hvid `#FFFFFF`, lys baggrund `#F5F7FA`
+- Tekst `#111827`, sekundær tekst `#526174`, kant `#E2E8F0`, stjerner `#F5B400`
+- Font: Inter (Google Fonts), fallback Arial/sans-serif
