@@ -3,7 +3,7 @@
 
    Sådan tilføjer du et billede:
    1. Læg filen i mappen  assets/gallery/  (fx assets/gallery/facade-bageri.jpg)
-   2. Tilføj en ny linje nedenfor:
+   2. Tilføj en ny linje nedenfor (husk komma til sidst på linjen):
       {src: 'assets/gallery/facade-bageri.jpg', title: 'Facadeskilt', category: 'facade', alt: 'Facadeskilt til et bageri'},
    3. Fjern  example: true  på de billeder, der er rigtige projekter.
 
@@ -30,5 +30,5 @@ window.GALLERY_ITEMS = [
   {src: 'https://images.unsplash.com/photo-1497366811353-6870744d04b2?auto=format&fit=crop&w=800&q=85', title: 'Vinduesfolie', category: 'folie', alt: 'Eksempelbillede af glaspartier', example: true},
   {src: 'https://images.unsplash.com/photo-1542038784456-1ea8e935640e?auto=format&fit=crop&w=800&q=85', title: 'Storformatprint', category: 'print', alt: 'Eksempelbillede af farverigt print', example: true},
   {src: 'https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=800&q=85', title: 'Indendørs skilt', category: 'indoor', alt: 'Eksempelbillede af reception med skiltning', example: true},
-  {src: 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&w=800&q=85', title: 'Indendørs skiltning', category: 'indoor', alt: 'Eksempelbillede af klinikindretning', example: true}
+  {src: 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&w=800&q=85', title: 'Indendørs skiltning', category: 'indoor', alt: 'Eksempelbillede af klinikindretning', example: true},
 ];

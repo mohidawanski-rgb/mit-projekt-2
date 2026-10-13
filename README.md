@@ -1,33 +1,33 @@
 # Skiltefabrikken – hjemmeside
 
-Flersidet statisk hjemmeside (HTML, CSS, JavaScript). Ingen framework og ingen build-proces ved hosting.
+Almindelige HTML-filer (HTML, CSS, JavaScript). Ingen framework og ingen build-proces: du kan åbne `index.html` direkte i en browser eller uploade mappen til dit webhotel.
 
-## Sider
-`index.html` (forside) · `skilte.html` · `folie.html` · `print-og-events.html` · `design-og-special.html` · `galleri.html` · `om-os.html` · `kontakt.html` · `privatlivspolitik.html` · `handelsbetingelser.html` · `cookies.html`
+## Filer
+- **Sider:** `index.html` (forside), `produkter.html`, produktsider (`facadeskilte.html`, `indendoers-skilte.html`, `bildekoration.html`, `vinduesfolie.html`, `print-og-dekoration.html`, `lysskilte.html`, `3d-bogstaver.html`, `pyloner-og-standere.html`, `messer-og-events.html`, `specialloesninger.html`), `services.html`, `galleri.html`, `om-os.html`, `kontakt.html`, `privatlivspolitik.html`, `handelsbetingelser.html`, `cookies.html`
+- `style.css` (design), `script.js` (funktioner og indstillinger), `gallery-data.js` (galleriets billeder)
+- `assets/` (logo, ikoner og reserve-illustrationer), `assets/gallery/` (dine egne galleribilleder)
 
-## Sådan kommer du i gang
-1. Upload alle `.html`-filer, `style.css`, `script.js` og mappen `assets/` til dit webhotel (typisk `public_html`).
-2. Åbn domænet i browseren.
+## Upload
+Upload alle filer og mapperne `assets/` til dit webhotel (typisk `public_html`), og åbn domænet. Husk `gallery-data.js` og `script.js`, ellers virker galleri og formular ikke.
 
-## Rediger indhold
-Siderne er genereret af `tools/build.py`. Tekster, produkter, FAQ og menu står øverst i scriptet. Efter ændringer kører du `python3 tools/build.py`, og de nye `.html`-filer skrives i projektets rod. Scriptet er ikke nødvendigt på webhotellet.
-
-## Billeder
-Billederne er illustrationsfotos fra Unsplash (de samme som i de oprindelige filer), hentet direkte fra Unsplash. De er ikke rigtige Skiltefabrikken-projekter. Udskift dem med egne fotos i `tools/build.py` (listen `IMG`, brug en lokal sti i stedet for Unsplash-adressen) før lancering.
+## Sådan redigerer du
+- **Tekster:** åbn den relevante `.html`-fil og ret teksten direkte. Header og footer er ens på alle sider og står markeret med kommentarerne `HEADER` og `FOOTER`.
+- **Galleri:** læg billedet i `assets/gallery/` og tilføj en linje i `gallery-data.js` (vejledning står øverst i filen). Fjern `example: true`, når billedet er et rigtigt projekt.
+- **Egne produktbilleder:** erstat Unsplash-adressen i `src` på billedet med `assets/img/dit-billede.jpg`. Hvis et foto ikke kan hentes, vises i stedet en illustration fra `assets/img/`.
+- **Anmeldelser:** udfyld `reviews` i `script.js` (plads til 20). Sektionen er skjult, til der er mindst én rigtig anmeldelse.
+- **Adresse og CVR:** står som pladsholdere i footeren (`[Indsæt adresse]`, `[Indsæt CVR-nummer]`). Søg efter `[Indsæt` i filerne, og ret dem.
+- **Telefon:** nummeret vises ikke på siden. "Ring til os"-knapperne bruger linket `tel:+4544119491`. Søg efter `tel:` og ret nummeret, hvis det skal ændres.
 
 ## Kontaktformular
-Formularen på `kontakt.html` åbner kundens mailprogram med en færdig mail til adressen i `contactEmail` øverst i `script.js` (nu `mohidawanski@gmail.com`). Skift den til firmamailen før lancering. Filer kan ikke vedhæftes automatisk, så kunden bliver bedt om at vedhæfte dem i mailen.
+Formularen kan sende på to måder (indstilles øverst i `script.js`):
+1. **Rigtig afsendelse (anbefalet):** opret en formular hos fx Formspree og indsæt adressen i `formEndpoint`. Så sendes forespørgslen direkte, med vedhæftede filer, hvis abonnementet understøtter filer.
+2. **Uden modtager (nu):** formularen åbner kundens mailprogram med en færdig mail til `contactEmail` (nu `mohidawanski@gmail.com`; skift til firmamailen før lancering). Filer kan ikke vedhæftes automatisk, så kunden bliver bedt om at vedhæfte dem i mailen.
 
 ## Før lancering
-- Kontroller telefon (`+45 44 11 94 91`) og e-mail (`info@skiltefabrikken.dk`).
-- Tilføj adresse og CVR i footeren, når de er klar (i `tools/build.py`).
+- Kontroller e-mail (`info@skiltefabrikken.dk`) og telefonlink.
+- Udskift eksempelbillederne (illustrationsfotos fra Unsplash) med egne fotos.
 - Få privatlivspolitik, handelsbetingelser og cookies gennemgået (de er standardskabeloner).
-- Anmeldelser: udfyld `reviews` i `script.js` med **rigtige** udtalelser. Sektionen på forsiden er skjult, til der er mindst én.
 - Test på mobil, tablet og computer.
 
 ## Designfarver
-- Primær blå `#0866F5`, hover `#0554D2`
-- Navy `#061421`, sekundær navy `#071B2A`, mørke kort `#102333`
-- Hvid `#FFFFFF`, lys baggrund `#F5F7FA`
-- Tekst `#111827`, sekundær tekst `#526174`, kant `#E2E8F0`, stjerner `#F5B400`
-- Font: Inter (Google Fonts), fallback Arial/sans-serif
+Primær blå `#0866F5` (hover `#0554D2`), navy `#061421`, mørke kort `#102333`, hvid `#FFFFFF`, lys baggrund `#F5F7FA`, tekst `#111827`, sekundær tekst `#526174`, kant `#E2E8F0`. Font: Inter (Google Fonts). Ingen grøn.

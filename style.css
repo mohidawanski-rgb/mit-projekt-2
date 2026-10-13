@@ -16,7 +16,8 @@ a{color:inherit;text-decoration:none}
 button,input,textarea,select{font:inherit}
 button{cursor:pointer}
 h1,h2,h3{margin:0}
-:focus-visible{outline:3px solid #66a8ff;outline-offset:3px}
+:focus-visible{outline:3px solid var(--blue);outline-offset:3px}
+.hero :focus-visible,.why-section :focus-visible,.gallery-section :focus-visible,.site-footer :focus-visible,.page-head :focus-visible,.cta-band :focus-visible,.contact-card :focus-visible{outline-color:#9cc2ff}
 .container{width:min(calc(100% - 64px),var(--container));margin-inline:auto}
 .container.narrow{max-width:900px}
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}
@@ -59,6 +60,8 @@ a:hover>.corners::before,a:hover>.corners::after,.gallery-card:hover .corners::b
 .sub a:hover{background:var(--surface);color:var(--blue)}
 .sub a.all{color:var(--blue);border-bottom:1px solid var(--line);border-radius:6px 6px 0 0;margin-bottom:4px}
 .header-actions,.button-row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.header-actions{flex-wrap:nowrap}
+.btn{white-space:nowrap}
 .icon-btn{background:transparent;border:0;width:46px;height:46px;display:grid;place-items:center;color:var(--navy);border-radius:6px}
 .icon-btn .ic{width:26px;height:26px}
 .menu-toggle{display:none;margin-left:auto}
@@ -168,7 +171,7 @@ h2.title,.section-heading h2,.why-intro h2,.services-intro h2,.contact-section h
 .gallery-section{padding:84px 0;background:#04111d;color:#fff}
 .gallery-section .section-sub{color:#aab8c7}
 .gallery-wrap{position:relative}
-.gallery-track{display:flex;gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;-webkit-overflow-scrolling:touch;padding-bottom:4px}
+.gallery-track{display:flex;gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;-webkit-overflow-scrolling:touch;padding:6px;margin:-6px}
 .gallery-track::-webkit-scrollbar{display:none}
 .gallery-track .gallery-card{flex:0 0 calc((100% - 56px)/5);scroll-snap-align:start}
 .gallery-card{margin:0;min-width:0}
@@ -210,10 +213,12 @@ h2.title,.section-heading h2,.why-intro h2,.services-intro h2,.contact-section h
 .reviews-section{background:var(--surface)}
 .reviews-section[hidden]{display:none}
 .rating-link{font-weight:700;font-size:14px;text-align:right}
+.review-carousel.static .round-arrow{display:none}
 .rating-link .stars-line{display:block;color:var(--star);letter-spacing:2px}
 .review-carousel{position:relative}
 .review-viewport{overflow:hidden;touch-action:pan-y}
 .review-track{display:flex;gap:14px;will-change:transform}
+.review-track.smooth{transition:transform .4s ease}
 .review-card{flex:0 0 calc((100% - 42px)/4);min-width:0;background:#fff;border:1px solid var(--line);border-radius:12px;padding:22px;min-height:210px}
 .review-card .quote-mark{color:var(--blue);font-size:38px;font-weight:900;line-height:1}
 .review-card .review-text{margin:6px 0 14px;min-height:60px;font-size:15px}
@@ -305,6 +310,7 @@ h2.title,.section-heading h2,.why-intro h2,.services-intro h2,.contact-section h
 .footer-grid>div:first-child p{display:block}
 .footer-grid a:hover{color:#fff}
 .footer-grid .ic{width:16px;height:16px;color:var(--blue)}
+.footer-grid .btn .ic{color:currentColor}
 .footer-grid .btn{margin:8px 8px 0 0}
 .placeholder{color:#9db0c4!important;font-style:italic}
 .footer-bottom{display:flex;justify-content:space-between;gap:15px;border-top:1px solid #324353;padding:18px 0;font-size:13px;color:#b8c5d1}
@@ -331,11 +337,13 @@ h2.title,.section-heading h2,.why-intro h2,.services-intro h2,.contact-section h
   .services-layout{grid-template-columns:1fr}
   .services-intro p:not(.eyebrow){max-width:560px}
 }
+@media(max-width:1100px){
+  .desktop-nav,.header-actions{display:none}
+  .menu-toggle{display:grid}
+}
 @media(max-width:1020px){
   .round-arrow.prev{left:-12px}
   .round-arrow.next{right:-12px}
-  .desktop-nav,.header-actions{display:none}
-  .menu-toggle{display:grid}
   .container{width:min(calc(100% - 40px),var(--container))}
   .section,.why-section,.gallery-section{padding:62px 0}
   .benefit-grid{grid-template-columns:repeat(3,1fr);gap:18px}
@@ -363,7 +371,9 @@ h2.title,.section-heading h2,.why-intro h2,.services-intro h2,.contact-section h
   .hero-content{padding-block:52px}
   .hero h1{font-size:clamp(36px,11vw,52px);letter-spacing:-1.5px}
   .hero-content>p:not(.eyebrow){font-size:16px}
-  .button-row .btn{flex:1;min-width:150px}
+  .button-row .btn{flex:1;min-width:140px;padding-inline:14px}
+  .button-row .btn .ic:last-child{display:none}
+  .rating-link{text-align:left}
   .benefit-grid{grid-template-columns:repeat(2,1fr);gap:16px 8px}
   .section,.why-section,.gallery-section{padding:50px 0}
   .inline-heading{align-items:start;flex-direction:column}

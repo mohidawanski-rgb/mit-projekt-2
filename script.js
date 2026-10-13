@@ -41,7 +41,7 @@ function setMenu(open) {
 if (menuToggle) {
   menuToggle.addEventListener('click', () => setMenu(menuToggle.getAttribute('aria-expanded') !== 'true'));
   $$('a', mobileNav).forEach(link => link.addEventListener('click', () => setMenu(false)));
-  window.addEventListener('resize', () => { if (window.innerWidth > 1020) setMenu(false); });
+  window.addEventListener('resize', () => { if (window.innerWidth > 1100) setMenu(false); });
 }
 
 /* ---------- Undersmenuer (hover på computer, tryk på mobil/tastatur) ---------- */
@@ -69,6 +69,16 @@ document.addEventListener('keydown', event => {
   closeSubMenus();
   setMenu(false);
 });
+
+/* ---------- Reserve-billeder: vis egen illustration, hvis et foto ikke kan hentes ---------- */
+function applyImageFallbacks(root = document) {
+  $$('img[data-fb]', root).forEach(img => {
+    const swap = () => { if (img.dataset.fbUsed) return; img.dataset.fbUsed = '1'; img.src = img.dataset.fb; };
+    if (img.complete && img.naturalWidth === 0 && img.getAttribute('src')) swap();
+    else img.addEventListener('error', swap, {once: true});
+  });
+}
+applyImageFallbacks();
 
 /* ---------- Animation ved scroll ---------- */
 function setupReveal() {
@@ -98,6 +108,7 @@ faqItems.forEach(item => item.addEventListener('toggle', () => {
    GALLERI (data hentes fra gallery-data.js)
    ========================================================================== */
 const galleryItems = window.GALLERY_ITEMS || [];
+const categoryFallback = {facade: 'facade', lys: 'lys', bil: 'bil', folie: 'folie', print: 'print', indoor: 'indoor'};
 const galleryCategories = window.GALLERY_CATEGORIES || {};
 const hasLightbox = $('#gallery-track') || $('#gallery-grid');
 let lightbox = null;
@@ -112,11 +123,13 @@ function createGalleryCard(item) {
   button.setAttribute('aria-label', `Forstør billede: ${item.title}`);
   const frame = document.createElement('span');
   frame.className = 'ph corners';
-  frame.style.aspectRatio = '4 / 5';
+  frame.style.aspectRatio = '4 / 3';
   const img = document.createElement('img');
   img.src = item.src; img.alt = item.alt || item.title; img.loading = 'lazy'; img.decoding = 'async';
   img.referrerPolicy = 'no-referrer';
+  img.dataset.fb = `assets/img/${categoryFallback[item.category] || 'facade'}.svg`;
   frame.append(img); button.append(frame);
+  applyImageFallbacks(frame);
   const caption = document.createElement('figcaption');
   const title = document.createElement('strong'); title.textContent = item.title;
   const sub = document.createElement('small');
@@ -138,6 +151,7 @@ function openLightbox(item) {
     lightbox.addEventListener('click', event => { if (event.target === lightbox) lightbox.close(); });
   }
   const img = $('img', lightbox);
+  img.onerror = () => { img.onerror = null; img.src = `assets/img/${categoryFallback[item.category] || 'facade'}.svg`; };
   img.src = item.src.replace('w=800', 'w=1600'); img.alt = item.alt || item.title;
   $('figcaption', lightbox).textContent = item.example ? `${item.title} – eksempelbillede, ikke et udført projekt` : item.title;
   if (typeof lightbox.showModal === 'function') lightbox.showModal();
@@ -146,7 +160,7 @@ function openLightbox(item) {
 // Karrusel på forsiden
 const galleryTrack = $('#gallery-track');
 if (galleryTrack) {
-  galleryItems.slice(0, 8).forEach(item => galleryTrack.append(createGalleryCard(item)));
+  galleryItems.forEach(item => galleryTrack.append(createGalleryCard(item)));
   const scrollBy = direction => {
     const card = $('.gallery-card', galleryTrack);
     const step = card ? card.getBoundingClientRect().width + 14 : galleryTrack.clientWidth * .8;
@@ -188,22 +202,26 @@ if (galleryGrid) {
    ANMELDELSER
    ========================================================================== */
 const validReviews = reviews
-  .filter(review => review && review.text && review.name && Number.isInteger(review.stars) && review.stars >= 1 && review.stars <= 5)
+  .filter(review => review
+    && String(review.text || '').trim() && String(review.name || '').trim()
+    && Number.isInteger(review.stars) && review.stars >= 1 && review.stars <= 5)
   .slice(0, MAX_REVIEWS);
 const reviewSection = $('#anmeldelser');
 
-function createReviewCard(review) {
+function createReviewCard(review, hidden) {
   const card = document.createElement('article');
   card.className = 'review-card';
-  const mark = document.createElement('div'); mark.className = 'quote-mark'; mark.textContent = '“';
-  const text = document.createElement('p'); text.className = 'review-text'; text.textContent = review.text;
+  if (hidden) card.setAttribute('aria-hidden', 'true');
+  const mark = document.createElement('div'); mark.className = 'quote-mark'; mark.textContent = '“'; mark.setAttribute('aria-hidden', 'true');
+  const text = document.createElement('p'); text.className = 'review-text'; text.textContent = String(review.text).trim();
   const stars = document.createElement('div'); stars.className = 'stars';
+  stars.setAttribute('role', 'img');
   stars.setAttribute('aria-label', `${review.stars} ud af 5 stjerner`);
   stars.textContent = '★'.repeat(review.stars) + '☆'.repeat(5 - review.stars);
   const person = document.createElement('div'); person.className = 'review-person';
   const nameBox = document.createElement('div');
-  const name = document.createElement('strong'); name.textContent = review.name;
-  const company = document.createElement('small'); company.textContent = review.company || '';
+  const name = document.createElement('strong'); name.textContent = String(review.name).trim();
+  const company = document.createElement('small'); company.textContent = String(review.company || '').trim();
   nameBox.append(name, company); person.append(nameBox);
   if (review.logo) {
     const logo = document.createElement('img');
@@ -215,50 +233,74 @@ function createReviewCard(review) {
 }
 
 if (reviewSection && validReviews.length) {
+  const carousel = $('.review-carousel');
   const reviewTrack = $('#review-track');
   const ratingLink = $('#rating-link');
+  const viewport = $('.review-viewport');
+  const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const gap = 14;
+  let offset = 0, lastTime = 0, paused = false, looping = false, lastWidth = 0, frameId = 0;
+
   reviewSection.hidden = false;
   const average = validReviews.reduce((sum, r) => sum + r.stars, 0) / validReviews.length;
+  const rounded = Math.round(average);
   $('.avg', ratingLink).textContent = `${average.toLocaleString('da-DK', {maximumFractionDigits: 1})} ud af 5`;
+  const starsLine = $('.stars-line', ratingLink);
+  starsLine.textContent = '★'.repeat(rounded) + '☆'.repeat(5 - rounded);
   if (reviewPlatformUrl) ratingLink.href = reviewPlatformUrl;
   else { ratingLink.removeAttribute('href'); ratingLink.removeAttribute('target'); }
 
-  const loop = validReviews.length > 1;
-  const items = loop ? [...validReviews, ...validReviews, ...validReviews] : validReviews;
-  items.forEach(item => reviewTrack.append(createReviewCard(item)));
-  const viewport = $('.review-viewport');
-  const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
-  let offset = 0, lastTime = 0, paused = false;
-  const gap = 14;
   const cardStep = () => $('.review-card', reviewTrack).getBoundingClientRect().width + gap;
   const groupWidth = () => cardStep() * validReviews.length;
   const draw = () => { reviewTrack.style.transform = `translate3d(${-offset}px,0,0)`; };
 
+  // Opbyg karrusellen. Er der færre anmeldelser, end der kan vises ad gangen, vises de statisk (ingen gentagelser, ingen pile).
+  function build() {
+    reviewTrack.innerHTML = '';
+    validReviews.forEach(r => reviewTrack.append(createReviewCard(r, false)));
+    const step = cardStep();
+    const visible = Math.max(1, Math.floor((viewport.clientWidth + gap) / step));
+    looping = validReviews.length > visible;
+    carousel.classList.toggle('static', !looping);
+    if (looping) {
+      for (let copy = 0; copy < 2; copy++) validReviews.forEach(r => reviewTrack.append(createReviewCard(r, true)));
+    }
+    offset = looping ? offset % groupWidth() : 0;
+    draw();
+  }
   function animate(timestamp) {
     if (!lastTime) lastTime = timestamp;
     const delta = Math.min(timestamp - lastTime, 60);
     lastTime = timestamp;
-    if (!paused && !motion.matches) {
+    if (looping && !paused && !motion.matches) {
       offset += cardStep() / 4.5 * delta / 1000; // ét kort på ca. 4,5 sekunder
       const width = groupWidth();
       if (width > 0 && offset >= width) offset %= width;
       draw();
     }
-    requestAnimationFrame(animate);
+    frameId = requestAnimationFrame(animate);
   }
   function moveCard(direction) {
-    if (!loop) return;
+    if (!looping) return;
     const width = groupWidth();
-    offset = (((offset + direction * cardStep()) % width) + width) % width;
+    reviewTrack.classList.add('smooth');
+    offset += direction * cardStep();
+    if (offset < 0) { reviewTrack.classList.remove('smooth'); offset += width; draw(); reviewTrack.getBoundingClientRect(); reviewTrack.classList.add('smooth'); offset -= cardStep(); }
+    else if (offset >= width) { reviewTrack.classList.remove('smooth'); offset -= width; draw(); reviewTrack.getBoundingClientRect(); reviewTrack.classList.add('smooth'); offset += cardStep(); }
     draw();
+    setTimeout(() => reviewTrack.classList.remove('smooth'), 450);
   }
-  if (loop) requestAnimationFrame(animate);
+  build();
+  lastWidth = window.innerWidth;
+  frameId = requestAnimationFrame(animate);
   viewport.addEventListener('mouseenter', () => { paused = true; });
   viewport.addEventListener('mouseleave', () => { paused = false; lastTime = 0; });
   viewport.addEventListener('focusin', () => { paused = true; });
   viewport.addEventListener('focusout', () => { paused = false; lastTime = 0; });
   $('.review-arrow.prev').addEventListener('click', () => moveCard(-1));
   $('.review-arrow.next').addEventListener('click', () => moveCard(1));
+  carousel.addEventListener('mouseenter', () => { paused = true; });
+  carousel.addEventListener('mouseleave', () => { paused = false; lastTime = 0; });
   let touchX = null;
   viewport.addEventListener('touchstart', event => { touchX = event.touches[0].clientX; paused = true; }, {passive: true});
   viewport.addEventListener('touchend', event => {
@@ -268,7 +310,11 @@ if (reviewSection && validReviews.length) {
     }
     touchX = null; paused = false; lastTime = 0;
   }, {passive: true});
-  window.addEventListener('resize', () => { offset = 0; draw(); });
+  // Genopbyg kun, når bredden faktisk ændres (mobilbrowsere udløser resize ved scroll)
+  window.addEventListener('resize', () => {
+    if (window.innerWidth === lastWidth) return;
+    lastWidth = window.innerWidth; build();
+  });
   document.addEventListener('visibilitychange', () => { lastTime = 0; });
 }
 
