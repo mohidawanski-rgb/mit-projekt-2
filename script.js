@@ -118,9 +118,15 @@ subMenus.forEach(menu => {
 document.addEventListener('click', () => closeSubMenus());
 document.addEventListener('keydown', event => {
   if (event.key !== 'Escape') return;
+  const activeInside = el => el && document.activeElement && el.contains(document.activeElement);
+  const returnTo = activeInside(mobileNav) ? menuToggle : (activeInside(searchPanel) ? searchToggle : null);
+  const openMenu = $('.has-sub.open');
+  const subToggle = openMenu ? $('.sub-toggle', openMenu) : null;
   closeSubMenus();
   setMenu(false);
   setSearch(false);
+  if (returnTo) returnTo.focus();
+  else if (subToggle && activeInside(openMenu)) subToggle.focus();
 });
 
 /* ---------- Reserve-billeder: vis egen illustration, hvis et foto ikke kan hentes ---------- */
@@ -209,8 +215,10 @@ function openLightbox(item) {
     lightbox.addEventListener('click', event => { if (event.target === lightbox) lightbox.close(); });
   }
   const img = $('img', lightbox);
-  img.onerror = () => { img.onerror = null; img.src = `assets/img/${categoryFallback[item.category] || 'facade'}.svg`; };
-  img.src = item.src.replace('w=800', 'w=1600'); img.alt = item.alt || item.title;
+  const illustration = `assets/img/${categoryFallback[item.category] || 'facade'}.svg`;
+  const chain = [item.src.replace('w=800', 'w=1600'), illustration];
+  img.onerror = () => { const next = chain.shift(); if (next) img.src = next; else img.onerror = null; };
+  img.src = item.local || chain.shift(); img.alt = item.alt || item.title;
   $('figcaption', lightbox).textContent = item.example ? `${item.title} – ${item.type || ''} (eksempelbillede, ikke et udført projekt)` : `${item.title} – ${item.type || ''}`;
   if (typeof lightbox.showModal === 'function') lightbox.showModal();
 }
@@ -365,6 +373,8 @@ if (reviewSection && shownReviews.length) {
   $('.review-arrow.next').addEventListener('click', () => moveCard(1));
   carousel.addEventListener('mouseenter', () => { paused = true; });
   carousel.addEventListener('mouseleave', () => { paused = false; lastTime = 0; });
+  carousel.addEventListener('focusin', () => { paused = true; });
+  carousel.addEventListener('focusout', () => { paused = false; lastTime = 0; });
   let touchX = null;
   viewport.addEventListener('touchstart', event => { touchX = event.touches[0].clientX; paused = true; }, {passive: true});
   viewport.addEventListener('touchend', event => {
@@ -402,11 +412,21 @@ if (quoteForm) {
   const fileIcon = '<svg class="ic" aria-hidden="true"><use href="assets/icons.svg#i-check"/></svg>';
   function showFiles() {
     fileList.innerHTML = '';
-    [...fileInput.files].forEach(file => {
+    [...fileInput.files].forEach((file, index) => {
       const li = document.createElement('li');
       li.innerHTML = fileIcon;
-      li.append(`${file.name} (${(file.size / 1024 / 1024).toFixed(1)} MB)`);
-      fileList.append(li);
+      const mb = file.size / 1024 / 1024;
+      const size = mb >= 0.1 ? `${mb.toLocaleString('da-DK', {maximumFractionDigits: 1})} MB` : `${Math.max(1, Math.round(file.size / 1024))} KB`;
+      li.append(`${file.name} (${size}) `);
+      const remove = document.createElement('button');
+      remove.type = 'button'; remove.textContent = 'Fjern'; remove.className = 'file-remove';
+      remove.setAttribute('aria-label', `Fjern ${file.name}`);
+      remove.addEventListener('click', () => {
+        const transfer = new DataTransfer();
+        [...fileInput.files].forEach((f, i) => { if (i !== index) transfer.items.add(f); });
+        fileInput.files = transfer.files; showFiles();
+      });
+      li.append(remove); fileList.append(li);
     });
   }
   fileInput.addEventListener('change', showFiles);
@@ -428,7 +448,7 @@ if (quoteForm) {
     if (data.get('_gotcha')) return; // spam-felt (skjult) er udfyldt
     const files = [...fileInput.files];
     const totalMb = files.reduce((sum, f) => sum + f.size, 0) / 1024 / 1024;
-    if (totalMb > MAX_TOTAL_MB) { say(`Filerne er for store (${totalMb.toFixed(1)} MB). Maks. ${MAX_TOTAL_MB} MB i alt.`, 'err'); return; }
+    if (totalMb > MAX_TOTAL_MB) { say(`Filerne er for store (${totalMb.toLocaleString('da-DK', {maximumFractionDigits: 1})} MB). Maks. ${MAX_TOTAL_MB} MB i alt.`, 'err'); return; }
     const subjectOption = productSelect ? productSelect.options[productSelect.selectedIndex] : null;
     const topic = data.get('product') && subjectOption ? subjectOption.textContent : '';
 
