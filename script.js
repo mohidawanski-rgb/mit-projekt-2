@@ -21,6 +21,10 @@ const reviews = [
 // Link til jeres egen Google-/Trustpilot-side (valgfrit).
 const reviewPlatformUrl = '';
 const MAX_REVIEWS = 20;
+// Forhåndsvisning af anmeldelsessektionen med pladsholdere ("[Skriv anmeldelsen her]"), som i designet.
+// Sæt til false for at skjule sektionen, indtil der er rigtige anmeldelser i "reviews" ovenfor.
+// Findes der rigtige anmeldelser, vises kun de rigtige.
+const SHOW_REVIEW_PLACEHOLDERS = true;
 
 /* ==========================================================================
    HJÆLPERE
@@ -29,19 +33,67 @@ const $ = (selector, root = document) => root.querySelector(selector);
 const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
 document.documentElement.classList.add('js');
 
-/* ---------- Menu ---------- */
+/* ---------- Menu og søgning (paneler under headeren) ---------- */
 const menuToggle = $('.menu-toggle');
 const mobileNav = $('#mobile-nav');
+const searchToggle = $('.search-toggle');
+const searchPanel = $('#search-panel');
 function setMenu(open) {
   if (!menuToggle || !mobileNav) return;
   menuToggle.setAttribute('aria-expanded', String(open));
   menuToggle.setAttribute('aria-label', open ? 'Luk menu' : 'Åbn menu');
   mobileNav.hidden = !open;
+  if (open) setSearch(false);
+}
+function setSearch(open) {
+  if (!searchToggle || !searchPanel) return;
+  searchToggle.setAttribute('aria-expanded', String(open));
+  searchPanel.hidden = !open;
+  if (open) { setMenu(false); $('#site-search').focus(); }
 }
 if (menuToggle) {
   menuToggle.addEventListener('click', () => setMenu(menuToggle.getAttribute('aria-expanded') !== 'true'));
   $$('a', mobileNav).forEach(link => link.addEventListener('click', () => setMenu(false)));
-  window.addEventListener('resize', () => { if (window.innerWidth > 1100) setMenu(false); });
+}
+if (searchToggle) {
+  searchToggle.addEventListener('click', () => setSearch(searchPanel.hidden));
+  // Søgeindeks: sider, produkter og services
+  // [navn, adresse, type, søgeord]
+  const searchIndex = [
+    ['Forside', 'index.html', 'Side', ''], ['Produkter', 'produkter.html', 'Side', 'alle produkter'], ['Services', 'services.html', 'Side', ''],
+    ['Galleri', 'galleri.html', 'Side', 'billeder eksempler'], ['Om os', 'om-os.html', 'Side', ''], ['Kontakt og tilbud', 'kontakt.html', 'Side', 'tilbud formular telefon mail'],
+    ['Facadeskilte', 'facadeskilte.html', 'Produkt', 'skilt facade udendørs'], ['Indendørs skilte', 'indendoers-skilte.html', 'Produkt', 'reception indendørs'],
+    ['Bildekoration', 'bildekoration.html', 'Produkt', 'folie bil bilreklame reklame'], ['Vinduesfolie', 'vinduesfolie.html', 'Produkt', 'folie vindue dekoration'],
+    ['Print & dekoration', 'print-og-dekoration.html', 'Produkt', 'storformat banner bannere plakat reklameprint'], ['Lysskilte og LED-skilte', 'lysskilte.html', 'Produkt', 'led lys neon'],
+    ['3D-bogstaver', '3d-bogstaver.html', 'Produkt', 'bogstaver facade logo'], ['Pyloner og standere', 'pyloner-og-standere.html', 'Produkt', 'pylon stander'],
+    ['Messer og events', 'messer-og-events.html', 'Produkt', 'messe stand event'], ['Specialløsninger', 'specialloesninger.html', 'Produkt', 'special skræddersyet'],
+    ['Rådgivning', 'services.html#raadgivning', 'Service', 'hjælp'], ['Grafisk design', 'services.html#grafisk-design', 'Service', 'logo grafiker design'],
+    ['Produktion', 'services.html#produktion', 'Service', ''], ['Montering', 'services.html#montering', 'Service', 'opsætning'],
+    ['Spørgsmål og svar (FAQ)', 'kontakt.html#faq', 'Side', 'faq pris leveringstid'], ['Privatlivspolitik', 'privatlivspolitik.html', 'Side', ''],
+    ['Handelsbetingelser', 'handelsbetingelser.html', 'Side', ''], ['Cookies', 'cookies.html', 'Side', '']
+  ];
+  const input = $('#site-search');
+  const results = $('#search-results');
+  const render = () => {
+    const q = input.value.trim().toLowerCase();
+    results.innerHTML = '';
+    const hits = q ? searchIndex.filter(([name, , , words]) => `${name} ${words}`.toLowerCase().includes(q)) : [];
+    hits.forEach(([name, href, kind]) => {
+      const li = document.createElement('li');
+      const a = document.createElement('a'); a.href = href; a.textContent = name;
+      const span = document.createElement('span'); span.textContent = kind; a.append(span);
+      li.append(a); results.append(li);
+    });
+    if (q && !hits.length) {
+      const li = document.createElement('li');
+      li.innerHTML = '<a href="kontakt.html">Ingen resultater – spørg os i stedet<span>Kontakt</span></a>';
+      results.append(li);
+    }
+  };
+  input.addEventListener('input', render);
+  input.addEventListener('keydown', event => {
+    if (event.key === 'Enter') { const first = $('a', results); if (first) window.location.href = first.getAttribute('href'); }
+  });
 }
 
 /* ---------- Undersmenuer (hover på computer, tryk på mobil/tastatur) ---------- */
@@ -68,14 +120,17 @@ document.addEventListener('keydown', event => {
   if (event.key !== 'Escape') return;
   closeSubMenus();
   setMenu(false);
+  setSearch(false);
 });
 
 /* ---------- Reserve-billeder: vis egen illustration, hvis et foto ikke kan hentes ---------- */
 function applyImageFallbacks(root = document) {
   $$('img[data-fb]', root).forEach(img => {
-    const swap = () => { if (img.dataset.fbUsed) return; img.dataset.fbUsed = '1'; img.src = img.dataset.fb; };
-    if (img.complete && img.naturalWidth === 0 && img.getAttribute('src')) swap();
-    else img.addEventListener('error', swap, {once: true});
+    // data-fb kan indeholde flere reserve-adresser adskilt af | (prøves i rækkefølge)
+    const chain = img.dataset.fb.split('|');
+    const next = () => { const url = chain.shift(); if (url) img.src = url; };
+    if (img.complete && img.naturalWidth === 0 && img.getAttribute('src')) next();
+    img.addEventListener('error', () => { if (chain.length) next(); });
   });
 }
 applyImageFallbacks();
@@ -125,15 +180,18 @@ function createGalleryCard(item) {
   frame.className = 'ph corners';
   frame.style.aspectRatio = '4 / 3';
   const img = document.createElement('img');
-  img.src = item.src; img.alt = item.alt || item.title; img.loading = 'lazy'; img.decoding = 'async';
+  img.alt = item.alt || item.title; img.loading = 'lazy'; img.decoding = 'async';
   img.referrerPolicy = 'no-referrer';
-  img.dataset.fb = `assets/img/${categoryFallback[item.category] || 'facade'}.svg`;
+  const illustration = `assets/img/${categoryFallback[item.category] || 'facade'}.svg`;
+  if (item.local) { img.src = item.local; img.dataset.fb = `${item.src}|${illustration}`; }
+  else { img.src = item.src; img.dataset.fb = illustration; }
   frame.append(img); button.append(frame);
   applyImageFallbacks(frame);
   const caption = document.createElement('figcaption');
   const title = document.createElement('strong'); title.textContent = item.title;
   const sub = document.createElement('small');
-  sub.textContent = item.example ? `Eksempelbillede · ${galleryCategories[item.category] || ''}` : (galleryCategories[item.category] || '');
+  const what = item.type || galleryCategories[item.category] || '';
+  sub.textContent = item.example ? `${what} · eksempel` : what;
   caption.append(title, sub);
   figure.append(button, caption);
   button.addEventListener('click', () => openLightbox(item));
@@ -153,7 +211,7 @@ function openLightbox(item) {
   const img = $('img', lightbox);
   img.onerror = () => { img.onerror = null; img.src = `assets/img/${categoryFallback[item.category] || 'facade'}.svg`; };
   img.src = item.src.replace('w=800', 'w=1600'); img.alt = item.alt || item.title;
-  $('figcaption', lightbox).textContent = item.example ? `${item.title} – eksempelbillede, ikke et udført projekt` : item.title;
+  $('figcaption', lightbox).textContent = item.example ? `${item.title} – ${item.type || ''} (eksempelbillede, ikke et udført projekt)` : `${item.title} – ${item.type || ''}`;
   if (typeof lightbox.showModal === 'function') lightbox.showModal();
 }
 
@@ -206,6 +264,9 @@ const validReviews = reviews
     && String(review.text || '').trim() && String(review.name || '').trim()
     && Number.isInteger(review.stars) && review.stars >= 1 && review.stars <= 5)
   .slice(0, MAX_REVIEWS);
+const usingPlaceholders = !validReviews.length && SHOW_REVIEW_PLACEHOLDERS;
+const PLACEHOLDER_REVIEWS = Array.from({length: 8}, () => ({text: '[Skriv anmeldelsen her]', stars: 5, name: 'Navn', company: 'Virksomhed', placeholder: true}));
+const shownReviews = usingPlaceholders ? PLACEHOLDER_REVIEWS : validReviews;
 const reviewSection = $('#anmeldelser');
 
 function createReviewCard(review, hidden) {
@@ -223,7 +284,10 @@ function createReviewCard(review, hidden) {
   const name = document.createElement('strong'); name.textContent = String(review.name).trim();
   const company = document.createElement('small'); company.textContent = String(review.company || '').trim();
   nameBox.append(name, company); person.append(nameBox);
-  if (review.logo) {
+  if (review.placeholder) {
+    const ph = document.createElement('div'); ph.className = 'logo-ph'; ph.textContent = 'LOGO'; ph.setAttribute('aria-hidden', 'true');
+    person.append(ph);
+  } else if (review.logo) {
     const logo = document.createElement('img');
     logo.src = review.logo; logo.alt = `Logo for ${review.company || review.name}`; logo.loading = 'lazy';
     person.append(logo);
@@ -232,38 +296,38 @@ function createReviewCard(review, hidden) {
   return card;
 }
 
-if (reviewSection && validReviews.length) {
+if (reviewSection && shownReviews.length) {
   const carousel = $('.review-carousel');
   const reviewTrack = $('#review-track');
   const ratingLink = $('#rating-link');
   const viewport = $('.review-viewport');
   const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
-  const gap = 14;
+  const gap = 12;
   let offset = 0, lastTime = 0, paused = false, looping = false, lastWidth = 0, frameId = 0;
 
   reviewSection.hidden = false;
-  const average = validReviews.reduce((sum, r) => sum + r.stars, 0) / validReviews.length;
+  const average = shownReviews.reduce((sum, r) => sum + r.stars, 0) / shownReviews.length;
   const rounded = Math.round(average);
-  $('.avg', ratingLink).textContent = `${average.toLocaleString('da-DK', {maximumFractionDigits: 1})} ud af 5`;
+  $('.avg', ratingLink).textContent = usingPlaceholders ? 'Gennemsnit: [X,X] ud af 5' : `Gennemsnit: ${average.toLocaleString('da-DK', {maximumFractionDigits: 1})} ud af 5`;
   const starsLine = $('.stars-line', ratingLink);
   starsLine.textContent = '★'.repeat(rounded) + '☆'.repeat(5 - rounded);
-  if (reviewPlatformUrl) ratingLink.href = reviewPlatformUrl;
+  if (reviewPlatformUrl && !usingPlaceholders) ratingLink.href = reviewPlatformUrl;
   else { ratingLink.removeAttribute('href'); ratingLink.removeAttribute('target'); }
 
   const cardStep = () => $('.review-card', reviewTrack).getBoundingClientRect().width + gap;
-  const groupWidth = () => cardStep() * validReviews.length;
+  const groupWidth = () => cardStep() * shownReviews.length;
   const draw = () => { reviewTrack.style.transform = `translate3d(${-offset}px,0,0)`; };
 
   // Opbyg karrusellen. Er der færre anmeldelser, end der kan vises ad gangen, vises de statisk (ingen gentagelser, ingen pile).
   function build() {
     reviewTrack.innerHTML = '';
-    validReviews.forEach(r => reviewTrack.append(createReviewCard(r, false)));
+    shownReviews.forEach(r => reviewTrack.append(createReviewCard(r, false)));
     const step = cardStep();
     const visible = Math.max(1, Math.floor((viewport.clientWidth + gap) / step));
-    looping = validReviews.length > visible;
+    looping = shownReviews.length > visible;
     carousel.classList.toggle('static', !looping);
     if (looping) {
-      for (let copy = 0; copy < 2; copy++) validReviews.forEach(r => reviewTrack.append(createReviewCard(r, true)));
+      for (let copy = 0; copy < 2; copy++) shownReviews.forEach(r => reviewTrack.append(createReviewCard(r, true)));
     }
     offset = looping ? offset % groupWidth() : 0;
     draw();
