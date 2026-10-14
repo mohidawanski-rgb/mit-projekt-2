@@ -188,6 +188,7 @@ function createGalleryCard(item) {
   const img = document.createElement('img');
   img.alt = item.alt || item.title; img.loading = 'lazy'; img.decoding = 'async';
   img.referrerPolicy = 'no-referrer';
+  if (item.pos) img.style.objectPosition = item.pos;
   const illustration = `assets/img/${categoryFallback[item.category] || 'facade'}.svg`;
   if (item.local) { img.src = item.local; img.dataset.fb = `${item.src}|${illustration}`; }
   else { img.src = item.src; img.dataset.fb = illustration; }

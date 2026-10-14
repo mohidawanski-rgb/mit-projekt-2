@@ -10,6 +10,7 @@
    Felter: src = billedfil · title = navn under billedet · type = hvad der er lavet
            category = facade · lys · bil · folie · print · indoor (bruges af filtrene på gallerisiden)
            local = (valgfri) egen fil, der vises først, hvis den findes, fx 'assets/img/galleri-1.jpg'
+           pos = (valgfri) hvor billedet beskæres i kortet, fx '50% 20%' (vandret og lodret placering)
    Billeder markeret  example: true  vises som eksempel og må ikke præsenteres
    som udførte projekter. De nuværende er illustrationsfotos fra Unsplash.
    ========================================================================== */
@@ -23,6 +24,9 @@ window.GALLERY_CATEGORIES = {
 };
 
 window.GALLERY_ITEMS = [
+  {src: 'assets/gallery/puff-n-stuff.jpg', title: "Puff'n'Stuff", type: 'Facadeskilt og vinduesfolie', category: 'facade', alt: "Facade med lysskilt og vinduesfolie til Puff'n'Stuff", pos: '50% 0%'},
+  {src: 'assets/gallery/kebabland.jpg', title: 'Kebabland', type: 'Facadeskilt med bogstaver', category: 'facade', alt: 'Facade med bogstavskilt til Kebabland', pos: '50% 22%'},
+  {src: 'assets/gallery/zeynos-kebab.jpg', title: "Zeyno's Kebab", type: 'LED-neonskilt', category: 'lys', alt: "LED-neonskilt til Zeyno's Kebab", pos: '50% 50%'},
   {local: 'assets/img/galleri-1.jpg', src: 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=800&q=85', title: 'Café', type: 'Vinduesfolie', category: 'folie', alt: 'Eksempelbillede af café med vinduesfolie', example: true},
   {local: 'assets/img/galleri-2.jpg', src: 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&w=800&q=85', title: 'Tandlægeklinik', type: 'Indendørs skilt', category: 'indoor', alt: 'Eksempelbillede af klinik med indendørs skilt', example: true},
   {local: 'assets/img/galleri-3.jpg', src: 'https://images.unsplash.com/photo-1497366811353-6870744d04b2?auto=format&fit=crop&w=800&q=85', title: 'Advokat', type: 'Facadeskilt', category: 'facade', alt: 'Eksempelbillede af kontor med facadeskilt', example: true},
