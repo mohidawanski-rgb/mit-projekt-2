@@ -12,12 +12,33 @@ const contactEmail = 'mohidawanski@gmail.com';
 // Er feltet tomt, åbnes i stedet kundens mailprogram med en færdig mail til contactEmail.
 const formEndpoint = '';
 
-// ANMELDELSER – plads til 20. Skriv kun rigtige anmeldelser. Sektionen vises først, når der er mindst én.
+// ANMELDELSER – plads til 20. Kun rigtige anmeldelser fra kunder, der har købt hos jer. Sektionen vises først, når der er mindst én.
+// Felter: title (overskrift), text (teksten; kan udelades, hvis kunden kun gav en overskrift), stars (1–5), name, date, company (valgfri), logo (valgfri).
 // Tilføj fx:
-//   {title: 'Flot arbejde', text: 'Virkelig flot arbejde!', stars: 5, name: 'Anna Jensen', company: 'Firma ApS', date: '12. marts 2026', logo: 'assets/firma-logo.png'},
-// "title" (overskrift), "company", "date" og "logo" er valgfrie. "stars" er et heltal fra 1 til 5.
-// Kun anmeldelser fra kunder, der har købt hos jer og har givet lov, må stå her.
+//   {title: 'Flot arbejde', text: 'Virkelig flot arbejde!', stars: 5, name: 'Anna Jensen', date: '12. marts 2026'},
+// De 20 anmeldelser nedenfor er fra før virksomhedens navneskifte til SKILTON; virksomhedsnavnet er opdateret i teksterne,
+// og det oplyses diskret under sektionen (#review-note). Fjern anmeldelser, kunderne ikke vil have vist.
 const reviews = [
+  {title: "Bedste skilt service i Danmark", text: "Bedste skilt service i Danmark. Kan slet ikke sammenlignes! Deres pris, design evne, tilgang under arbejde og tilpasning af skilt er præcis det man forstiller sig. Hvis man også ønsker design eller kvalitet uanset om det er LED skilt, plakat eller merchandise skal man 100% bestille det hos SKILTON!!!❤️🔥\n\nHelt klar kan anbefales🤩", stars: 5, name: "Erfani", date: "28. juli 2026"},
+  {title: "Dygtig til sit arbejde", text: "God service og rigtig dygtig til sit arbejde, varm anbefaling herfra.", stars: 5, name: "Sebastian Orale", date: "22. juli 2026"},
+  {title: "God service og flotte skilte!", stars: 5, name: "Martin Petersen", date: "22. juli 2026"},
+  {title: "VARM ANBEFALING!", text: "Vi kan varmt anbefale SKILTON!\n\nVi har fået leveret nogle virkelig flotte skilte, og hele forløbet har været en fantastisk oplevelse. Kvaliteten er helt i top, servicen er professionel, og de har været imødekommende og hjælpsomme fra start til slut.\n\nResultatet lever fuldt ud op til vores forventninger skiltene ser flotte ud og giver et professionelt indtryk. Vi er meget glade for samarbejdet og vil uden tvivl benytte SKILTON igen.\n\nStor tak for det flotte arbejde!", stars: 5, name: "Omar G", date: "21. juli 2026"},
+  {title: "Jeg har brugt dette skiltefirma i over…", text: "Jeg har brugt dette skiltefirma i over 5 år, og de har lavet alle mine skilte. Altid høj kvalitet, professionel rådgivning og leveret til tiden. De er pålidelige, løsningsorienterede og nemme at arbejde sammen med. Kan klart anbefales, hvis man vil have skilte, der både holder og ser skarpe ud.", stars: 5, name: "Gihad Ibrahim", date: "25. januar 2026"},
+  {title: "Fremragende", text: "Særdeles tilfreds med mine skilte til Batobehandler butikken! Kan helt klart anbefale SKILTON, altid behjælpelig og klar til at yde en ekstra service!\n\n5 stjerner herfra ⭐️⭐️⭐️⭐️⭐️‼️", stars: 5, name: "Bato Behandler", date: "25. januar 2026"},
+  {title: "Vi fik lavet logo på vores 8 pallers…", text: "Vi fik lavet logo på vores 8 pallers lift bil og kan klart anbefale dem hurtige dygtige og så god service fra dem nu står vi med vores første bil med logo takket være dette skønne firma 5 stjerner her fra ville give mere hvis det var muligt\n\nMvh. HR Transport ApS", stars: 5, name: "HR Transport ApS", date: "7. januar 2026"},
+  {title: "Fantastisk service - Kan helt klart anbefale", text: "Jeg har haft en rigtig god oplevelse med SKILTON. Fra første kontakt var kommunikationen professionel, imødekommende og meget effektiv. De var virkelig gode til at rådgive mig omkring de forskellige designs, materialer og løsninger, så vores skilte blev helt perfekte.\n\nDet var virkelig en fordel at kunne få lavet alt fra samme sted. Jeg fik både facadeskiltet, visitkort, klistermærker og t-shirts med vores logo. Det hele var præcis som jeg ønskede det.\n\nJeg kan klart anbefale SKILTON, hvis man ønsker en samlet løsning med flot resultat og god service.", stars: 5, name: "Marie isabella", date: "6. januar 2026"},
+  {title: "Fantastisk service og flotte resultater!", text: "Jeg har fået lavet skilte til min klinik og resultatet er simpelthen perfekt. Jeg er yderst tilfreds med både kvaliteten og hele processen. Kundeservicen var i top, kommunikationen var hurtig og behagelig og ejeren er utrolig flink og imødekommende.\n\nJeg kan varmt anbefale dette firma til alle, der ønsker professionelt arbejde og en god oplevelse hele vejen igennem!", stars: 5, name: "Chantal", date: "10. december 2025"},
+  {title: "Kanon service", text: "Ja hvad skal sige synes det er den absolut bedste service og et firma som virkelig er kreativ og betænksom som kommer med løsninger og hjælper hele vejen igennem til det mindste detaljer 😊😊, kan stærkt anbefale dem", stars: 5, name: "Minan Latif", date: "30. marts 2025"},
+  {title: "Kan klart anbefales !!", text: "Kan klart anbefales !!! 😍😍😍\n\nJeg har netop fået lavet skilte til mine to butikker, og jeg kunne ikke være mere tilfreds! Servicen var helt i top fra start til slut, og resultatet overgik mine forventninger. Skiltene er flotte, professionelle og præcist, som jeg ønskede det. Kan varmt anbefale SKILTON til alle, der har brug for kvalitetsarbejde og god kundeservice!", stars: 5, name: "sara", date: "25. december 2024"},
+  {title: "God kvalitet til gode priser", text: "Vi har brugt SKILTON siden vores første skilt tilbage i 2021 og har brugt dem siden til flere skilte med belysning sant foliering af to food trucks og kommer til at bruge dem fremadrettet også.", stars: 5, name: "Zinat", date: "7. december 2024"},
+  {title: "⭐️⭐️⭐️⭐️⭐️", text: "⭐️⭐️⭐️⭐️⭐️\n\nJeg havde en fantastisk oplevelse med SKILTON ! Fra start til slut var teamet ekstremt professionelle og imødekommende. De tog sig tid til at forstå mine behov og kom med kreative forslag, der virkelig bragte mine idéer til live.\n\nKvaliteten af de 3D skilte, de producerede, var intet mindre end imponerende. Detaljerne og finishen var perfekte, og de tiltrak straks opmærksomhed. Jeg har modtaget så mange positive kommentarer fra både kunder og kolleger!\n\nDerudover var processen hurtig og effektiv. Leveringstiden blev overholdt, og priserne var rimelige i forhold til den høje kvalitet, jeg fik. Jeg vil helt klart anbefale SKILTON til alle, der søger efter pålidelige og kreative løsninger til reklamer og skilte. Jeg glæder mig til at arbejde sammen med dem igen i fremtiden!\n\nTak for en fantastisk service! 🙌✨", stars: 5, name: "Said Ghizzaui", date: "7. december 2024"},
+  {title: "Vi har fået leveret facade-skiltning…", text: "Vi har fået leveret facade-skiltning til to butikker fra SKILTON, og vi kunne ikke være mere tilfredse! Resultatet er virkelig imponerende – skiltene er udført i høj kvalitet, og de ser både stilrene og professionelle ud.\n\nDet hele blev leveret hurtigt, og servicen undervejs var helt i top. Kommunikationen var klar og effektiv, og det var tydeligt, at SKILTON går op i at levere et produkt, der lever op til kundens forventninger.", stars: 5, name: "Kasper Lundsted Jensen", date: "7. december 2024"},
+  {title: "Super positiv overrasket over det lækre…", text: "Super positiv overrasket over det lækre design som SKILTON har skabt for mig! Jeg kan ikke andet end at give 5 ⭐️⭐️⭐️⭐️⭐️\n\nSuper service, du får hvad du betaler for. Kan helt klart anbefales!\n\nBatobehandler", stars: 5, name: "Filip Ristic", date: "26. februar 2024"},
+  {title: "Vi fik lavet et super fint facade skilt…", text: "Vi fik lavet et super fint facade skilt , med hurtig levering og super kvalitet.", stars: 5, name: "Denis", date: "18. december 2023"},
+  {title: "Glad og tilfreds kunde", text: "Jeg er super glad for mit skilt som SKILTON har lavet. Den kunne ikke blive bedre. Også har jeg fået en rigtig god service.", stars: 5, name: "Coco Beauty & Skin", date: "5. december 2023"},
+  {title: "Kan virkelig anbefale!", stars: 5, name: "Miro", date: "6. oktober 2023"},
+  {title: "🌟 stjernet kundeservice og formidable priser", text: "Jeg kan klart anbefale SKILTON til alt der har med skilte at gøre.\n\nVi hos Astro Energi ledte efter et indendørs logo til vores kontor samt et facadeskilt til vores showroom. Her faldt vi over SKILTON og fik allerede besøg af Mehdi samme dag som vi tog kontakt. Han kom med rådgivning om, hvor stort skiltene skulle være for at de var dimensioneret korrekt og leverede det efter aftalte tid. 5 🌟 herfra!", stars: 5, name: "Kristoffer Dahlberg", date: "7. september 2023"},
+  {title: "Brugt dem til facade skilte og kan…", text: "Brugt dem til facade skilte og kan absolut anbefale dem. Virkelig professionelle og meget kompetente.", stars: 5, name: "Eda Meric", date: "28. marts 2023"}
 ];
 // Link til jeres egen Google-/Trustpilot-side (valgfrit).
 const reviewPlatformUrl = '';
@@ -26,6 +47,8 @@ const MAX_REVIEWS = 20;
 // Sæt til false for at skjule sektionen, indtil der er rigtige anmeldelser i "reviews" ovenfor.
 // Findes der rigtige anmeldelser, vises kun de rigtige.
 const SHOW_REVIEW_PLACEHOLDERS = true;
+// Gennemsnit/samlet score vises ikke ved rigtige anmeldelser (ingen score uden korrekt grundlag). Sæt til true og angiv reviewPlatformUrl for at vise den.
+const SHOW_REVIEW_AVERAGE = false;
 
 /* ==========================================================================
    HJÆLPERE
@@ -320,7 +343,7 @@ if (galleryGrid) {
    ========================================================================== */
 const validReviews = reviews
   .filter(review => review
-    && String(review.text || '').trim() && String(review.name || '').trim()
+    && (String(review.text || '').trim() || String(review.title || '').trim()) && String(review.name || '').trim()
     && Number.isInteger(review.stars) && review.stars >= 1 && review.stars <= 5)
   .slice(0, MAX_REVIEWS);
 const usingPlaceholders = !validReviews.length && SHOW_REVIEW_PLACEHOLDERS;
@@ -347,7 +370,8 @@ function createReviewCard(review, hidden) {
     const title = document.createElement('h3'); title.className = 'review-title'; title.textContent = String(review.title).trim();
     card.append(title);
   }
-  const text = document.createElement('p'); text.className = 'review-text'; text.textContent = String(review.text).trim();
+  const text = document.createElement('p'); text.className = 'review-text'; text.textContent = String(review.text || '').trim();
+  if (!text.textContent) text.hidden = true;
   const more = document.createElement('button');
   more.type = 'button'; more.className = 'read-more'; more.textContent = 'Læs mere'; more.hidden = true;
   more.setAttribute('aria-expanded', 'false');
@@ -406,6 +430,10 @@ if (reviewSection && shownReviews.length) {
   starsLine.textContent = '★'.repeat(rounded) + '☆'.repeat(5 - rounded);
   if (reviewPlatformUrl && !usingPlaceholders) ratingLink.href = reviewPlatformUrl;
   else { ratingLink.removeAttribute('href'); ratingLink.removeAttribute('target'); }
+  // Rigtige anmeldelser: ingen samlet score, medmindre den udtrykkeligt er slået til
+  ratingLink.hidden = !usingPlaceholders && !SHOW_REVIEW_AVERAGE;
+  const reviewNote = $('#review-note');
+  if (reviewNote) reviewNote.hidden = usingPlaceholders;
 
   const cardStep = () => $('.review-card', reviewTrack).getBoundingClientRect().width + gap;
   const groupWidth = () => cardStep() * shownReviews.length;

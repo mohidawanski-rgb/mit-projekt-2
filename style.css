@@ -611,3 +611,11 @@ a:hover>.corners::before,a:hover>.corners::after,.gallery-card:hover .corners::b
 .lightbox-nav:active{transform:scale(.92)}
 .lightbox-count{margin:0;font-size:13px;color:#aab8c7}
 .lightbox-count:empty{display:none}
+
+/* ---------- Anmeldelser: afsnit og oplysning om navneskifte ---------- */
+.review-card .review-text{white-space:pre-line}
+.review-note{margin:14px 0 0;font-size:12.5px;line-height:1.5;color:var(--muted);max-width:760px}
+.review-note[hidden]{display:none}
+.rating-link[hidden]{display:none}
+/* Er et kort foldet ud, vokser kun det kort (de andre bliver ikke strakt) */
+.review-track:has(.review-card.open){align-items:flex-start}
