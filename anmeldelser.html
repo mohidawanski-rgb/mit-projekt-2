@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SKILTON – Kundeanmeldelser</title>
+<style>
+  /* Tilpas brand-farverne her, så de matcher SKILTONs hjemmeside */
+  :root {
+    --sk-accent: #c8102e;
+    --sk-dark: #14181f;
+    --sk-text: #3a414d;
+    --sk-muted: #7b8493;
+    --sk-bg: #f5f6f8;
+    --sk-card: #ffffff;
+    --sk-gold: #f5b301;
+    --sk-gap: 24px;
+    --sk-per-view: 3;
+  }
+  @media (max-width: 1024px) { :root { --sk-per-view: 2; --sk-gap: 20px; } }
+  @media (max-width: 640px)  { :root { --sk-per-view: 1; --sk-gap: 16px; } }
+
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: "Helvetica Neue", Arial, sans-serif; background: var(--sk-bg); color: var(--sk-text); }
+
+  .sk-reviews { padding: 72px 16px; }
+  .sk-reviews__inner { max-width: 1200px; margin: 0 auto; }
+  .sk-reviews__head { text-align: center; margin-bottom: 40px; }
+  .sk-reviews__head h2 { margin: 0 0 10px; font-size: clamp(1.7rem, 4vw, 2.5rem); color: var(--sk-dark); letter-spacing: -.01em; }
+  .sk-reviews__head h2::after { content: ""; display: block; width: 56px; height: 4px; border-radius: 2px; background: var(--sk-accent); margin: 14px auto 0; }
+  .sk-reviews__head p { margin: 0; color: var(--sk-muted); font-size: 1.05rem; }
+
+  .sk-carousel { position: relative; padding: 0 28px; }
+  .sk-track {
+    display: flex; gap: var(--sk-gap);
+    overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch; scrollbar-width: none;
+    padding: 8px 4px 28px; align-items: stretch;
+  }
+  .sk-track::-webkit-scrollbar { display: none; }
+
+  .sk-card {
+    flex: 0 0 calc((100% - (var(--sk-per-view) - 1) * var(--sk-gap)) / var(--sk-per-view));
+    scroll-snap-align: start;
+    background: var(--sk-card); border-radius: 16px; padding: 26px 24px 22px;
+    box-shadow: 0 2px 4px rgba(20,24,31,.05), 0 10px 28px rgba(20,24,31,.08);
+    display: flex; flex-direction: column; min-width: 0;
+  }
+  .sk-stars { color: var(--sk-gold); font-size: 1.25rem; letter-spacing: 2px; margin-bottom: 12px; }
+  .sk-card h3 { margin: 0 0 12px; font-size: 1.1rem; line-height: 1.35; color: var(--sk-dark); }
+  .sk-text { margin: 0; font-size: .96rem; line-height: 1.65; white-space: pre-line; }
+  .sk-text.is-clamped { display: -webkit-box; -webkit-line-clamp: 5; -webkit-box-orient: vertical; overflow: hidden; }
+  .sk-more {
+    align-self: flex-start; margin-top: 10px; padding: 0; border: 0; background: none;
+    color: var(--sk-accent); font: inherit; font-weight: 600; font-size: .92rem; cursor: pointer;
+  }
+  .sk-more:hover { text-decoration: underline; }
+  .sk-more[hidden] { display: none; }
+  .sk-meta { margin-top: auto; padding-top: 18px; display: flex; flex-direction: column; gap: 2px; border-top: 1px solid #eceef2; }
+  .sk-card .sk-text, .sk-card .sk-more { margin-bottom: 18px; }
+  .sk-name { font-weight: 700; color: var(--sk-dark); }
+  .sk-date { font-size: .85rem; color: var(--sk-muted); }
+
+  .sk-nav {
+    position: absolute; top: 50%; transform: translateY(-60%); z-index: 2;
+    width: 46px; height: 46px; border-radius: 50%; border: 0; cursor: pointer;
+    background: var(--sk-card); color: var(--sk-dark); font-size: 1.4rem; line-height: 1;
+    box-shadow: 0 4px 14px rgba(20,24,31,.18); transition: background .2s, color .2s, opacity .2s;
+  }
+  .sk-nav:hover:not(:disabled) { background: var(--sk-accent); color: #fff; }
+  .sk-nav:disabled { opacity: .35; cursor: default; }
+  .sk-nav--prev { left: -12px; }
+  .sk-nav--next { right: -12px; }
+  .sk-nav:focus-visible, .sk-more:focus-visible { outline: 3px solid var(--sk-accent); outline-offset: 2px; }
+
+  @media (max-width: 640px) {
+    .sk-reviews { padding: 48px 16px; }
+    .sk-carousel { padding: 0; }
+    .sk-nav { display: none; } /* mobil: swipe */
+  }
+</style>
+</head>
+<body>
+
+<section class="sk-reviews" aria-labelledby="sk-reviews-title">
+  <div class="sk-reviews__inner">
+    <div class="sk-reviews__head">
+      <h2 id="sk-reviews-title">Det siger vores kunder</h2>
+      <p>Læs om vores kunders oplevelser med skilte, design og service.</p>
+    </div>
+    <div class="sk-carousel" role="region" aria-roledescription="karrusel" aria-label="Kundeanmeldelser">
+      <button class="sk-nav sk-nav--prev" type="button" aria-label="Forrige anmeldelser">&#8249;</button>
+      <div class="sk-track" id="sk-track" tabindex="0"></div>
+      <button class="sk-nav sk-nav--next" type="button" aria-label="Næste anmeldelser">&#8250;</button>
+    </div>
+  </div>
+</section>
+
+<script>
+/* Tilføj nye anmeldelser her – kortene genereres automatisk. */
+const REVIEWS = [
+  { name: "Erfani", date: "28. juli 2026", title: "Bedste skilt service i Danmark",
+    text: "Bedste skilt service i Danmark. Kan slet ikke sammenlignes! Deres pris, design evne, tilgang under arbejde og tilpasning af skilt er præcis det man forstiller sig. Hvis man også ønsker design eller kvalitet uanset om det er LED skilt, plakat eller merchandise skal man 100% bestille det hos SKILTON!!!❤️🔥\nHelt klar kan anbefales🤩" },
+  { name: "Sebastian Orale", date: "22. juli 2026", title: "Dygtig til sit arbejde",
+    text: "God service og rigtig dygtig til sit arbejde, varm anbefaling herfra." },
+  { name: "Martin Petersen", date: "22. juli 2026", title: "God service og flotte skilte!", text: "" },
+  { name: "Omar G", date: "21. juli 2026", title: "VARM ANBEFALING!",
+    text: "Vi kan varmt anbefale SKILTON!\nVi har fået leveret nogle virkelig flotte skilte, og hele forløbet har været en fantastisk oplevelse. Kvaliteten er helt i top, servicen er professionel, og de har været imødekommende og hjælpsomme fra start til slut.\nResultatet lever fuldt ud op til vores forventninger skiltene ser flotte ud og giver et professionelt indtryk. Vi er meget glade for samarbejdet og vil uden tvivl benytte SKILTON igen.\nStor tak for det flotte arbejde!" },
+  { name: "Gihad Ibrahim", date: "25. januar 2026", title: "Jeg har brugt dette skiltefirma i over…",
+    text: "Jeg har brugt dette skiltefirma i over 5 år, og de har lavet alle mine skilte. Altid høj kvalitet, professionel rådgivning og leveret til tiden. De er pålidelige, løsningsorienterede og nemme at arbejde sammen med. Kan klart anbefales, hvis man vil have skilte, der både holder og ser skarpe ud." },
+  { name: "Bato Behandler", date: "25. januar 2026", title: "Fremragende",
+    text: "Særdeles tilfreds med mine skilte til Batobehandler butikken! Kan helt klart anbefale SKILTON, altid behjælpelig og klar til at yde en ekstra service!\n5 stjerner herfra ⭐️⭐️⭐️⭐️⭐️‼️" },
+  { name: "HR Transport ApS", date: "7. januar 2026", title: "Vi fik lavet logo på vores 8 pallers…",
+    text: "Vi fik lavet logo på vores 8 pallers lift bil og kan klart anbefale dem hurtige dygtige og så god service fra dem nu står vi med vores første bil med logo takket være dette skønne firma 5 stjerner her fra ville give mere hvis det var muligt\nMvh. HR Transport ApS" },
+  { name: "Marie isabella", date: "6. januar 2026", title: "Fantastisk service - Kan helt klart anbefale",
+    text: "Jeg har haft en rigtig god oplevelse med SKILTON. Fra første kontakt var kommunikationen professionel, imødekommende og meget effektiv. De var virkelig gode til at rådgive mig omkring de forskellige designs, materialer og løsninger, så vores skilte blev helt perfekte.\nDet var virkelig en fordel at kunne få lavet alt fra samme sted. Jeg fik både facadeskiltet, visitkort, klistermærker og t-shirts med vores logo. Det hele var præcis som jeg ønskede det.\nJeg kan klart anbefale SKILTON, hvis man ønsker en samlet løsning med flot resultat og god service." },
+  { name: "Chantal", date: "10. december 2025", title: "Fantastisk service og flotte resultater!",
+    text: "Jeg har fået lavet skilte til min klinik og resultatet er simpelthen perfekt. Jeg er yderst tilfreds med både kvaliteten og hele processen. Kundeservicen var i top, kommunikationen var hurtig og behagelig og ejeren er utrolig flink og imødekommende.\nJeg kan varmt anbefale dette firma til alle, der ønsker professionelt arbejde og en god oplevelse hele vejen igennem!" },
+  { name: "Minan Latif", date: "30. marts 2025", title: "Kanon service",
+    text: "Ja hvad skal sige synes det er den absolut bedste service og et firma som virkelig er kreativ og betænksom som kommer med løsninger og hjælper hele vejen igennem til det mindste detaljer 😊😊, kan stærkt anbefale dem" },
+  { name: "sara", date: "25. december 2024", title: "Kan klart anbefales !!",
+    text: "Kan klart anbefales !!! 😍😍😍\nJeg har netop fået lavet skilte til mine to butikker, og jeg kunne ikke være mere tilfreds! Servicen var helt i top fra start til slut, og resultatet overgik mine forventninger. Skiltene er flotte, professionelle og præcist, som jeg ønskede det. Kan varmt anbefale SKILTON til alle, der har brug for kvalitetsarbejde og god kundeservice!" }
+  /* Anmeldelse 12 (Zinat, 7. december 2024) og 13–20 mangler – indsæt her. */
+];
+
+(function () {
+  const track = document.getElementById("sk-track");
+  const prev = document.querySelector(".sk-nav--prev");
+  const next = document.querySelector(".sk-nav--next");
+
+  REVIEWS.forEach(function (r) {
+    const card = document.createElement("article");
+    card.className = "sk-card";
+
+    const stars = document.createElement("div");
+    stars.className = "sk-stars";
+    stars.setAttribute("role", "img");
+    stars.setAttribute("aria-label", "5 ud af 5 stjerner");
+    stars.textContent = "★★★★★";
+
+    const h = document.createElement("h3");
+    h.textContent = r.title;
+
+    card.append(stars, h);
+
+    if (r.text) {
+      const p = document.createElement("p");
+      p.className = "sk-text is-clamped";
+      p.textContent = r.text;
+      const more = document.createElement("button");
+      more.type = "button";
+      more.className = "sk-more";
+      more.textContent = "Læs mere";
+      more.hidden = true;
+      more.addEventListener("click", function () {
+        const open = p.classList.toggle("is-clamped");
+        more.textContent = open ? "Læs mere" : "Vis mindre";
+        more.setAttribute("aria-expanded", String(!open));
+      });
+      card.append(p, more);
+    }
+
+    const meta = document.createElement("div");
+    meta.className = "sk-meta";
+    const n = document.createElement("span");
+    n.className = "sk-name";
+    n.textContent = r.name;
+    const d = document.createElement("span");
+    d.className = "sk-date";
+    d.textContent = r.date;
+    meta.append(n, d);
+    card.append(meta);
+    track.append(card);
+  });
+
+  /* Vis kun "Læs mere" hvor teksten faktisk er afkortet */
+  function updateMoreButtons() {
+    track.querySelectorAll(".sk-card").forEach(function (card) {
+      const p = card.querySelector(".sk-text");
+      const more = card.querySelector(".sk-more");
+      if (!p || !more) return;
+      if (p.classList.contains("is-clamped")) more.hidden = p.scrollHeight <= p.clientHeight + 1;
+    });
+  }
+
+  function step() {
+    const card = track.querySelector(".sk-card");
+    return card ? card.getBoundingClientRect().width + parseFloat(getComputedStyle(track).columnGap || 0) : 0;
+  }
+  function updateNav() {
+    prev.disabled = track.scrollLeft <= 2;
+    next.disabled = track.scrollLeft >= track.scrollWidth - track.clientWidth - 2;
+  }
+  prev.addEventListener("click", function () { track.scrollBy({ left: -step() }); });
+  next.addEventListener("click", function () { track.scrollBy({ left: step() }); });
+  track.addEventListener("scroll", updateNav, { passive: true });
+  track.addEventListener("keydown", function (e) {
+    if (e.key === "ArrowRight") { track.scrollBy({ left: step() }); e.preventDefault(); }
+    if (e.key === "ArrowLeft") { track.scrollBy({ left: -step() }); e.preventDefault(); }
+  });
+  window.addEventListener("resize", function () { updateMoreButtons(); updateNav(); });
+  updateMoreButtons();
+  updateNav();
+})();
+</script>
+</body>
+</html>
