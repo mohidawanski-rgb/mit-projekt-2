@@ -65,7 +65,7 @@ if (searchToggle) {
     ['Galleri', 'galleri.html', 'Side', 'billeder eksempler'], ['Om os', 'om-os.html', 'Side', ''], ['Kontakt og tilbud', 'kontakt.html', 'Side', 'tilbud formular telefon mail'],
     ['Facadeskilte', 'facadeskilte.html', 'Produkt', 'skilt facade udendørs'], ['Indendørs skilte', 'indendoers-skilte.html', 'Produkt', 'reception indendørs'],
     ['Bildekoration', 'bildekoration.html', 'Produkt', 'folie bil bilreklame reklame'], ['Vinduesfolie', 'vinduesfolie.html', 'Produkt', 'folie vindue dekoration'],
-    ['Print & dekoration', 'print-og-dekoration.html', 'Produkt', 'storformat banner bannere plakat reklameprint'], ['Lysskilte og LED-skilte', 'lysskilte.html', 'Produkt', 'led lys neon'],
+    ['Storformatprint', 'storformatprint.html', 'Produkt', 'storformat print banner bannere plakat plakater'], ['Reklame og print', 'reklame-og-print.html', 'Produkt', 'reklameprint tryksager klistermærker flyer folder dekoration'], ['LED-lysskilte', 'lysskilte.html', 'Produkt', 'led lys lysskilte neon belyst'],
     ['3D-bogstaver', '3d-bogstaver.html', 'Produkt', 'bogstaver facade logo'], ['Pyloner og standere', 'pyloner-og-standere.html', 'Produkt', 'pylon stander'],
     ['Messer og events', 'messer-og-events.html', 'Produkt', 'messe stand event'], ['Specialløsninger', 'specialloesninger.html', 'Produkt', 'special skræddersyet'],
     ['Rådgivning', 'services.html#raadgivning', 'Service', 'hjælp'], ['Grafisk design', 'services.html#grafisk-design', 'Service', 'logo grafiker design'],

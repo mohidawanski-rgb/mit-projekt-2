@@ -1,9 +1,9 @@
-# Skiltefabrikken – hjemmeside
+# SKILTON – hjemmeside
 
 Almindelige HTML-filer (HTML, CSS, JavaScript). Ingen framework og ingen build-proces: du kan åbne `index.html` direkte i en browser eller uploade mappen til dit webhotel.
 
 ## Filer
-- **Sider:** `index.html` (forside), `produkter.html`, produktsider (`facadeskilte.html`, `indendoers-skilte.html`, `bildekoration.html`, `vinduesfolie.html`, `print-og-dekoration.html`, `lysskilte.html`, `3d-bogstaver.html`, `pyloner-og-standere.html`, `messer-og-events.html`, `specialloesninger.html`), `services.html`, `galleri.html`, `om-os.html`, `kontakt.html`, `privatlivspolitik.html`, `handelsbetingelser.html`, `cookies.html`
+- **Sider:** `index.html` (forside), `produkter.html`, produktsider (`facadeskilte.html`, `indendoers-skilte.html`, `bildekoration.html`, `vinduesfolie.html`, `storformatprint.html`, `reklame-og-print.html`, `lysskilte.html`, `3d-bogstaver.html`, `pyloner-og-standere.html`, `messer-og-events.html`, `specialloesninger.html`), `services.html`, `galleri.html`, `om-os.html`, `kontakt.html`, `privatlivspolitik.html`, `handelsbetingelser.html`, `cookies.html`
 - `style.css` (design), `script.js` (funktioner og indstillinger), `gallery-data.js` (galleriets billeder)
 - `assets/` (logo `logo-skilton.png` til lys baggrund, `logo-skilton-hvid.png` til mørk baggrund/footer, favicon, ikoner og reserve-illustrationer), `assets/gallery/` (dine egne galleribilleder)
 
@@ -27,7 +27,7 @@ Formularen kan sende på to måder (indstilles øverst i `script.js`):
 Logoet er `assets/logo-skilton.png` (header) og `assets/logo-skilton-hvid.png` (footer, hvid skrift til den mørke baggrund). Begge har gennemsigtig baggrund. Skal logoet skiftes igen, erstattes de to filer (samme filnavne, samme højde-til-bredde-forhold), og `assets/favicon-skilton.png` (browserfane-ikon), `assets/apple-touch-icon.png` (ikon på iPhone-startskærm) og `assets/logo-ikon-hvid.png` (svagt ikon i footeren) opdateres.
 
 ## Før lancering
-- Kontroller e-mail (`info@skiltefabrikken.dk`) og telefonlink.
+- Kontroller e-mail (nu `mohidawanski@gmail.com` i footer og på kontaktsiden; skift til firmamailen før lancering ved at søge efter adressen i `.html`-filerne og rette den) og telefonlink.
 - Udskift eksempelbillederne (illustrationsfotos fra Unsplash) med egne fotos.
 - Få privatlivspolitik, handelsbetingelser og cookies gennemgået (de er standardskabeloner).
 - Test på mobil, tablet og computer.

@@ -16,7 +16,7 @@
    ========================================================================== */
 window.GALLERY_CATEGORIES = {
   facade: 'Facadeskilte',
-  lys: 'Lysskilte',
+  lys: 'LED-lysskilte',
   bil: 'Bildekoration',
   folie: 'Vinduesfolie',
   print: 'Print',
@@ -35,6 +35,6 @@ window.GALLERY_ITEMS = [
   {src: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=800&q=85', title: 'Kontorbygning', type: 'Facadeskilt', category: 'facade', alt: 'Eksempelbillede af facade med skilt', example: true},
   {src: 'https://images.unsplash.com/photo-1519608487953-e999c86e7455?auto=format&fit=crop&w=800&q=85', title: 'Restaurant', type: 'Lysskilt', category: 'lys', alt: 'Eksempelbillede af belyst skiltning', example: true},
   {src: 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=800&q=85', title: 'Varebil', type: 'Bildekoration', category: 'bil', alt: 'Eksempelbillede af køretøj til bildekoration', example: true},
-  {src: 'https://images.unsplash.com/photo-1542038784456-1ea8e935640e?auto=format&fit=crop&w=800&q=85', title: 'Butik', type: 'Print & dekoration', category: 'print', alt: 'Eksempelbillede af farverigt print', example: true},
+  {src: 'https://images.unsplash.com/photo-1542038784456-1ea8e935640e?auto=format&fit=crop&w=800&q=85', title: 'Butik', type: 'Storformatprint', category: 'print', alt: 'Eksempelbillede af farverigt print', example: true},
   {src: 'https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=800&q=85', title: 'Reception', type: 'Indendørs skilt', category: 'indoor', alt: 'Eksempelbillede af reception med skiltning', example: true},
 ];

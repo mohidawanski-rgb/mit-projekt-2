@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Skiltefabrikken – stylesheet
+   SKILTON – stylesheet
    Farver: hvid, mørk navy og kraftig blå. Ingen grøn.
    Layout og mål følger designbilledet (side ca. 1440 px bred, kompakt tæthed).
    ========================================================================== */
@@ -598,3 +598,6 @@ a:hover>.corners::before,a:hover>.corners::after,.gallery-card:hover .corners::b
 .footer-brand .brand-logo{width:min(230px,100%);height:auto}
 @media(max-width:1180px){.brand-logo{height:46px}}
 @media(max-width:650px){.brand-logo{height:38px}.footer-brand .brand-logo{width:min(188px,100%);height:auto}}
+
+/* ---------- Footer: 11 produkter i to kolonner på store skærme (holder footerens højde nede) ---------- */
+@media(min-width:1280px){.footer-prods{display:grid;grid-auto-flow:column;grid-template-rows:repeat(6,auto);column-gap:18px}}
