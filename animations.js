@@ -48,7 +48,7 @@
       ['.why-intro > *', 'left'], ['.services-intro > *', 'left'],
       ['.benefit-grid > div', 'pop'], ['.product-grid > *', 'up'],
       ['.why-grid > article:nth-child(3n+1)', 'left'], ['.why-grid > article:nth-child(3n+2)', 'up'], ['.why-grid > article:nth-child(3n)', 'right'],
-      ['.services-grid > *', 'up'], ['.gallery-wrap', 'zoom'], ['.gallery-grid > .gallery-card', 'zoom'],
+      ['.services-grid > *', 'up'], ['.gallery-wrap', 'zoom'], ['.gallery-grid > .gallery-card, .feature-rest > .gallery-card, .feature-main > .gallery-card', 'zoom'], ['.group-head', 'mask'],
       ['.gallery-note, .gallery-filters', 'up'], ['.review-carousel', 'zoom'],
       ['.contact-grid > div:first-child', 'left'], ['.contact-grid > div:last-child, .contact-card', 'right'],
       ['.faq-list details', 'up'], ['.steps > .step', 'up'], ['.checks > li', 'left'],
@@ -372,7 +372,7 @@
   /* ---------- Galleri: kort glider ind igen ved filtrering ---------- */
   function galleryFilterEffects() {
     const filters = $('#gallery-filters');
-    const grid = $('#gallery-grid');
+    const grid = $('#gallery-page');
     if (!filters || !grid) return;
     on(filters, 'click', event => {
       if (!event.target.closest('.filter-btn')) return;

@@ -278,7 +278,7 @@ function openLightbox(item, card) {
     }, {passive: true});
   }
   // Billederne, der kan bladres imellem: de synlige kort i samme galleri (respekterer filteret)
-  const holder = card && card.closest('#gallery-track, #gallery-grid');
+  const holder = card && card.closest('#gallery-track, #gallery-page');
   lightboxList = holder ? $$('.gallery-card', holder).filter(c => !c.hidden && c._item).map(c => c._item) : [item];
   if (!lightboxList.includes(item)) lightboxList = [item];
   if (typeof lightbox.showModal === 'function' && !lightbox.open) lightbox.showModal();
@@ -324,7 +324,21 @@ const galleryGrid = $('#gallery-grid');
 if (galleryGrid) {
   const filters = $('#gallery-filters');
   const cards = galleryItems.map(createGalleryCard);
-  cards.forEach(card => galleryGrid.append(card));
+  // Rigtige facadeskilte samles øverst i sektionen "Facadeskilte": det markerede billede (feature) står først og stort
+  const featureMain = $('#feature-main'), featureRest = $('#feature-rest');
+  const groupFacade = $('#group-facade'), groupMore = $('#group-more'), moreHead = $('#more-head');
+  const facadeCards = featureMain && featureRest
+    ? cards.filter((card, i) => galleryItems[i].category === 'facade' && !galleryItems[i].example) : [];
+  const mainCard = facadeCards.find(card => card._item.feature) || facadeCards[0];
+  cards.forEach(card => {
+    if (card === mainCard) { card.classList.add('is-feature'); featureMain.append(card); }
+    else if (facadeCards.includes(card)) featureRest.append(card);
+    else galleryGrid.append(card);
+  });
+  const updateGroups = key => {
+    [groupFacade, groupMore].forEach(group => { if (group) group.hidden = !$$('.gallery-card:not([hidden])', group).length; });
+    if (moreHead) moreHead.hidden = key !== 'alle' || !facadeCards.length;
+  };
   const used = [...new Set(galleryItems.map(i => i.category))];
   const makeButton = (key, label) => {
     const b = document.createElement('button');
@@ -340,7 +354,9 @@ if (galleryGrid) {
     $$('.filter-btn', filters).forEach(b => b.setAttribute('aria-pressed', String(b === button)));
     const key = button.dataset.filter;
     cards.forEach(card => { card.hidden = key !== 'alle' && card.dataset.category !== key; });
+    updateGroups(key);
   });
+  updateGroups('alle');
 }
 
 /* ==========================================================================

@@ -632,3 +632,31 @@ a:hover>.corners::before,a:hover>.corners::after,.gallery-card:hover .corners::b
 .rating-link[hidden]{display:none}
 /* Er et kort foldet ud, vokser kun det kort (de andre bliver ikke strakt) */
 .review-track:has(.review-card.open){align-items:flex-start}
+
+/* ---------- Gallerisiden: grupperne "Facadeskilte" (stort billede først) og "Flere projekter" ---------- */
+.gallery-group{margin-bottom:38px}
+.gallery-group[hidden],.group-head[hidden]{display:none}
+.group-head{margin-bottom:16px}
+.group-head h2{font-size:clamp(21px,2.1vw,30px);line-height:1.15;font-weight:900;letter-spacing:-.7px}
+.gallery-feature{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,8fr);gap:14px;align-items:start}
+.feature-main{position:sticky;top:92px;align-self:start}
+.feature-main .gallery-card{position:relative}
+.feature-main .gallery-card .ph{aspect-ratio:4/5!important;height:auto}
+.feature-main .gallery-card figcaption{position:absolute;left:0;right:0;bottom:0;padding:44px 18px 16px;background:linear-gradient(transparent,#020a12ee 78%);border-radius:0 0 6px 6px;pointer-events:none}
+.feature-main .gallery-card strong{font-size:21px;line-height:1.2}
+.feature-main .gallery-card small{font-size:14px}
+.feature-rest{column-count:3;column-gap:14px}
+.feature-rest .gallery-card{display:inline-block;width:100%;margin:0 0 14px;break-inside:avoid}
+.feature-rest .gallery-card[hidden]{display:none}
+@media(max-width:1020px){
+  .gallery-feature{grid-template-columns:1fr}
+  .feature-main{position:static}
+  .feature-main .gallery-card .ph{aspect-ratio:4/3!important}
+  .feature-rest{column-count:3}
+}
+@media(max-width:650px){
+  .feature-main .gallery-card .ph{aspect-ratio:4/5!important}
+  .feature-rest{column-count:2;column-gap:10px}
+  .feature-rest .gallery-card{margin-bottom:10px}
+  .feature-main .gallery-card strong{font-size:18px}
+}
