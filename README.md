@@ -5,7 +5,7 @@ Almindelige HTML-filer (HTML, CSS, JavaScript). Ingen framework og ingen build-p
 ## Filer
 - **Sider:** `index.html` (forside), `produkter.html`, produktsider (`facadeskilte.html`, `indendoers-skilte.html`, `bildekoration.html`, `vinduesfolie.html`, `print-og-dekoration.html`, `lysskilte.html`, `3d-bogstaver.html`, `pyloner-og-standere.html`, `messer-og-events.html`, `specialloesninger.html`), `services.html`, `galleri.html`, `om-os.html`, `kontakt.html`, `privatlivspolitik.html`, `handelsbetingelser.html`, `cookies.html`
 - `style.css` (design), `script.js` (funktioner og indstillinger), `gallery-data.js` (galleriets billeder)
-- `assets/` (logo, ikoner og reserve-illustrationer), `assets/gallery/` (dine egne galleribilleder)
+- `assets/` (logo `logo-skilton.png` til lys baggrund, `logo-skilton-hvid.png` til mørk baggrund/footer, favicon, ikoner og reserve-illustrationer), `assets/gallery/` (dine egne galleribilleder)
 
 ## Upload
 Upload alle filer og mapperne `assets/` til dit webhotel (typisk `public_html`), og åbn domænet. Husk `gallery-data.js` og `script.js`, ellers virker galleri og formular ikke.
@@ -22,6 +22,9 @@ Upload alle filer og mapperne `assets/` til dit webhotel (typisk `public_html`),
 Formularen kan sende på to måder (indstilles øverst i `script.js`):
 1. **Rigtig afsendelse (anbefalet):** opret en formular hos fx Formspree og indsæt adressen i `formEndpoint`. Så sendes forespørgslen direkte, med vedhæftede filer, hvis abonnementet understøtter filer.
 2. **Uden modtager (nu):** formularen åbner kundens mailprogram med en færdig mail til `contactEmail` (nu `mohidawanski@gmail.com`; skift til firmamailen før lancering). Filer kan ikke vedhæftes automatisk, så kunden bliver bedt om at vedhæfte dem i mailen.
+
+## Logo
+Logoet er `assets/logo-skilton.png` (header) og `assets/logo-skilton-hvid.png` (footer, hvid skrift til den mørke baggrund). Begge har gennemsigtig baggrund. Skal logoet skiftes igen, erstattes de to filer (samme filnavne, samme højde-til-bredde-forhold), og `assets/favicon-skilton.png` (browserfane-ikon) og `assets/logo-ikon-hvid.png` (svagt ikon i footeren) opdateres.
 
 ## Før lancering
 - Kontroller e-mail (`info@skiltefabrikken.dk`) og telefonlink.
