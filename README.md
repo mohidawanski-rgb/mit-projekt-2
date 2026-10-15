@@ -24,7 +24,7 @@ Formularen kan sende på to måder (indstilles øverst i `script.js`):
 2. **Uden modtager (nu):** formularen åbner kundens mailprogram med en færdig mail til `contactEmail` (nu `mohidawanski@gmail.com`; skift til firmamailen før lancering). Filer kan ikke vedhæftes automatisk, så kunden bliver bedt om at vedhæfte dem i mailen.
 
 ## Logo
-Logoet er `assets/logo-skilton.png` (header) og `assets/logo-skilton-hvid.png` (footer, hvid skrift til den mørke baggrund). Begge har gennemsigtig baggrund. Skal logoet skiftes igen, erstattes de to filer (samme filnavne, samme højde-til-bredde-forhold), og `assets/favicon-skilton.png` (browserfane-ikon) og `assets/logo-ikon-hvid.png` (svagt ikon i footeren) opdateres.
+Logoet er `assets/logo-skilton.png` (header) og `assets/logo-skilton-hvid.png` (footer, hvid skrift til den mørke baggrund). Begge har gennemsigtig baggrund. Skal logoet skiftes igen, erstattes de to filer (samme filnavne, samme højde-til-bredde-forhold), og `assets/favicon-skilton.png` (browserfane-ikon), `assets/apple-touch-icon.png` (ikon på iPhone-startskærm) og `assets/logo-ikon-hvid.png` (svagt ikon i footeren) opdateres.
 
 ## Før lancering
 - Kontroller e-mail (`info@skiltefabrikken.dk`) og telefonlink.
