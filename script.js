@@ -14,8 +14,9 @@ const formEndpoint = '';
 
 // ANMELDELSER – plads til 20. Skriv kun rigtige anmeldelser. Sektionen vises først, når der er mindst én.
 // Tilføj fx:
-//   {text: 'Virkelig flot arbejde!', stars: 5, name: 'Anna Jensen', company: 'Firma ApS', logo: 'assets/firma-logo.png'},
-// "logo" er valgfrit. "stars" er et heltal fra 1 til 5.
+//   {title: 'Flot arbejde', text: 'Virkelig flot arbejde!', stars: 5, name: 'Anna Jensen', company: 'Firma ApS', date: '12. marts 2026', logo: 'assets/firma-logo.png'},
+// "title" (overskrift), "company", "date" og "logo" er valgfrie. "stars" er et heltal fra 1 til 5.
+// Kun anmeldelser fra kunder, der har købt hos jer og har givet lov, må stå her.
 const reviews = [
 ];
 // Link til jeres egen Google-/Trustpilot-side (valgfrit).
@@ -274,7 +275,7 @@ const validReviews = reviews
     && Number.isInteger(review.stars) && review.stars >= 1 && review.stars <= 5)
   .slice(0, MAX_REVIEWS);
 const usingPlaceholders = !validReviews.length && SHOW_REVIEW_PLACEHOLDERS;
-const PLACEHOLDER_REVIEWS = Array.from({length: 8}, () => ({text: '[Skriv anmeldelsen her]', stars: 5, name: 'Navn', company: 'Virksomhed', placeholder: true}));
+const PLACEHOLDER_REVIEWS = Array.from({length: 8}, () => ({title: '[Overskrift]', text: '[Skriv anmeldelsen her]', stars: 5, name: 'Navn', company: 'Virksomhed', date: '[Dato]', placeholder: true}));
 const shownReviews = usingPlaceholders ? PLACEHOLDER_REVIEWS : validReviews;
 const reviewSection = $('#anmeldelser');
 
@@ -282,17 +283,33 @@ function createReviewCard(review, hidden) {
   const card = document.createElement('article');
   card.className = 'review-card';
   if (hidden) card.setAttribute('aria-hidden', 'true');
-  const mark = document.createElement('div'); mark.className = 'quote-mark'; mark.textContent = '“'; mark.setAttribute('aria-hidden', 'true');
-  const text = document.createElement('p'); text.className = 'review-text'; text.textContent = String(review.text).trim();
   const stars = document.createElement('div'); stars.className = 'stars';
   stars.setAttribute('role', 'img');
   stars.setAttribute('aria-label', `${review.stars} ud af 5 stjerner`);
   stars.textContent = '★'.repeat(review.stars) + '☆'.repeat(5 - review.stars);
+  card.append(stars);
+  if (review.title && String(review.title).trim()) {
+    const title = document.createElement('h3'); title.className = 'review-title'; title.textContent = String(review.title).trim();
+    card.append(title);
+  }
+  const text = document.createElement('p'); text.className = 'review-text'; text.textContent = String(review.text).trim();
+  const more = document.createElement('button');
+  more.type = 'button'; more.className = 'read-more'; more.textContent = 'Læs mere'; more.hidden = true;
+  more.setAttribute('aria-expanded', 'false');
+  if (hidden) more.tabIndex = -1;
+  more.addEventListener('click', () => {
+    const open = card.classList.toggle('open');
+    more.textContent = open ? 'Vis mindre' : 'Læs mere';
+    more.setAttribute('aria-expanded', String(open));
+  });
+  card.append(text, more);
   const person = document.createElement('div'); person.className = 'review-person';
   const nameBox = document.createElement('div');
   const name = document.createElement('strong'); name.textContent = String(review.name).trim();
-  const company = document.createElement('small'); company.textContent = String(review.company || '').trim();
-  nameBox.append(name, company); person.append(nameBox);
+  nameBox.append(name);
+  const sub = [String(review.company || '').trim(), String(review.date || '').trim()].filter(Boolean).join(' · ');
+  if (sub) { const small = document.createElement('small'); small.textContent = sub; nameBox.append(small); }
+  person.append(nameBox);
   if (review.placeholder) {
     const ph = document.createElement('div'); ph.className = 'logo-ph'; ph.textContent = 'LOGO'; ph.setAttribute('aria-hidden', 'true');
     person.append(ph);
@@ -301,8 +318,20 @@ function createReviewCard(review, hidden) {
     logo.src = review.logo; logo.alt = `Logo for ${review.company || review.name}`; logo.loading = 'lazy';
     person.append(logo);
   }
-  card.append(mark, text, stars, person);
+  card.append(person);
   return card;
+}
+
+// Viser "Læs mere" kun på kort, hvor teksten er klippet
+function updateReadMore(root) {
+  root.querySelectorAll('.review-card').forEach(card => {
+    const text = card.querySelector('.review-text');
+    const more = card.querySelector('.read-more');
+    if (!text || !more) return;
+    const open = card.classList.contains('open');
+    if (open) { more.hidden = false; return; }
+    more.hidden = !(text.scrollHeight > text.clientHeight + 2);
+  });
 }
 
 if (reviewSection && shownReviews.length) {
@@ -340,12 +369,13 @@ if (reviewSection && shownReviews.length) {
     }
     offset = looping ? offset % groupWidth() : 0;
     draw();
+    updateReadMore(reviewTrack);
   }
   function animate(timestamp) {
     if (!lastTime) lastTime = timestamp;
     const delta = Math.min(timestamp - lastTime, 60);
     lastTime = timestamp;
-    if (looping && !paused && !motion.matches) {
+    if (looping && !paused && !motion.matches && !reviewTrack.querySelector('.review-card.open')) {
       offset += cardStep() / 4.5 * delta / 1000; // ét kort på ca. 4,5 sekunder
       const width = groupWidth();
       if (width > 0 && offset >= width) offset %= width;
