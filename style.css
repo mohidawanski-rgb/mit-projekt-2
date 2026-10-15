@@ -594,7 +594,7 @@ a:hover>.corners::before,a:hover>.corners::after,.gallery-card:hover .corners::b
 @media(max-width:650px){.review-card{flex-basis:100%}.rating-link{justify-items:start}}
 
 /* ---------- Nyt logo (SKILTON) ---------- */
-.brand-logo{display:block;height:54px;width:auto;max-width:100%}
-.footer-brand .brand-logo{height:60px}
-@media(max-width:1180px){.brand-logo{height:44px}}
-@media(max-width:650px){.brand-logo{height:36px}.footer-brand .brand-logo{height:50px}}
+.brand-logo{display:block;height:56px;width:auto;max-width:100%}
+.footer-brand .brand-logo{height:66px}
+@media(max-width:1180px){.brand-logo{height:46px}}
+@media(max-width:650px){.brand-logo{height:38px}.footer-brand .brand-logo{height:54px}}
