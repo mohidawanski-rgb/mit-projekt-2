@@ -206,9 +206,17 @@ const galleryCategories = window.GALLERY_CATEGORIES || {};
 const hasLightbox = $('#gallery-track') || $('#gallery-grid');
 let lightbox = null;
 
+// Størrelse i forsidens mosaik: small | tall | big | wide (valgfrit felt "shape", ellers udledt af "ratio")
+function galleryShape(item) {
+  if (['small', 'tall', 'big', 'wide'].includes(item.shape)) return item.shape;
+  const [w, h] = String(item.ratio || '4 / 3').split('/').map(Number);
+  const ratio = w && h ? w / h : 1.33;
+  return ratio < 0.7 ? 'tall' : ratio > 1.7 ? 'wide' : 'small';
+}
+
 function createGalleryCard(item) {
   const figure = document.createElement('figure');
-  figure.className = 'gallery-card';
+  figure.className = `gallery-card shape-${galleryShape(item)}`;
   figure.dataset.category = item.category;
   const button = document.createElement('button');
   button.type = 'button';
@@ -216,7 +224,7 @@ function createGalleryCard(item) {
   button.setAttribute('aria-label', `Forstør billede: ${item.title}`);
   const frame = document.createElement('span');
   frame.className = 'ph corners';
-  frame.style.aspectRatio = '4 / 3';
+  frame.style.aspectRatio = item.ratio || '4 / 3'; // billedets eget format (bruges på gallerisiden)
   const img = document.createElement('img');
   img.alt = item.alt || item.title; img.loading = 'lazy'; img.decoding = 'async';
   img.referrerPolicy = 'no-referrer';
@@ -301,11 +309,8 @@ function showLightbox(index, direction) {
 const galleryTrack = $('#gallery-track');
 if (galleryTrack) {
   galleryItems.forEach(item => galleryTrack.append(createGalleryCard(item)));
-  const scrollBy = direction => {
-    const card = $('.gallery-card', galleryTrack);
-    const step = card ? card.getBoundingClientRect().width + 14 : galleryTrack.clientWidth * .8;
-    galleryTrack.scrollBy({left: direction * step * 2, behavior: 'smooth'});
-  };
+  // Kortene har forskellig bredde, så der rulles ca. 80 % af sporets bredde ad gangen
+  const scrollBy = direction => galleryTrack.scrollBy({left: direction * galleryTrack.clientWidth * .8, behavior: 'smooth'});
   $('.gallery-arrow.prev').addEventListener('click', () => scrollBy(-1));
   $('.gallery-arrow.next').addEventListener('click', () => scrollBy(1));
   galleryTrack.addEventListener('keydown', event => {

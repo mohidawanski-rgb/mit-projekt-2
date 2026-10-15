@@ -12,7 +12,7 @@ Upload alle filer og mapperne `assets/` til dit webhotel (typisk `public_html`),
 
 ## Sådan redigerer du
 - **Tekster:** åbn den relevante `.html`-fil og ret teksten direkte. Header og footer er ens på alle sider og står markeret med kommentarerne `HEADER` og `FOOTER`.
-- **Galleri:** læg billedet i `assets/gallery/` og tilføj en linje i `gallery-data.js` (vejledning står øverst i filen). Fjern `example: true`, når billedet er et rigtigt projekt.
+- **Galleri:** læg billedet i `assets/gallery/` og tilføj en linje i `gallery-data.js` (vejledning står øverst i filen). Fjern `example: true`, når billedet er et rigtigt projekt. Hvert billede har et format: `ratio` (fx `'640 / 1138'`, billedets bredde/højde i pixels) bruges på gallerisiden, hvor billederne vises i deres eget format i et murstensmønster, og `shape` (`small`, `tall`, `big` eller `wide`) bestemmer størrelsen i forsidens mosaik. Billeder med `hero: true` indgår i forsidens billedskift.
 - **Egne produktbilleder:** erstat Unsplash-adressen i `src` på billedet med `assets/img/dit-billede.jpg`. Hvis et foto ikke kan hentes, vises i stedet en illustration fra `assets/img/`.
 - **Anmeldelser:** udfyld `reviews` i `script.js` (plads til 20; felter: `title`, `text`, `stars`, `name`, `company`, `date`, `logo`). Kun rigtige anmeldelser fra egne kunder, der har givet lov. Vises 3 ad gangen på computer, 2 på tablet og 1 på mobil, med pile, swipe og "Læs mere". Pladsholderne i designet slås fra med `SHOW_REVIEW_PLACEHOLDERS = false`.
 - **Adresse og CVR:** står som pladsholdere i footeren (`[Indsæt adresse]`, `[Indsæt CVR-nummer]`). Søg efter `[Indsæt` i filerne, og ret dem.

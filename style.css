@@ -178,13 +178,24 @@ a:hover>.corners::before,a:hover>.corners::after,.gallery-card:hover .corners::b
 .gallery-section{padding:24px 0 26px;background:#04111d;color:#fff}
 .gallery-section .section-sub{color:#aab8c7}
 .gallery-wrap{position:relative}
-.gallery-track{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;-webkit-overflow-scrolling:touch;padding:6px;margin:-6px}
+/* Forsidens galleri: vandret mosaik med forskellige størrelser (små, høje og store kort) i to rækker */
+.gallery-track{--u:clamp(96px,8.6vw,128px);display:grid;grid-auto-flow:column dense;grid-auto-columns:var(--u);grid-template-rows:repeat(2,var(--u));gap:12px;overflow-x:auto;scroll-snap-type:x proximity;scrollbar-width:none;-webkit-overflow-scrolling:touch;padding:6px;margin:-6px}
 .gallery-track::-webkit-scrollbar{display:none}
-.gallery-track .gallery-card{flex:0 0 calc((100% - 48px)/5);scroll-snap-align:start}
+.gallery-track .gallery-card{position:relative;scroll-snap-align:start;min-height:0}
+.shape-tall{grid-row:span 2}
+.shape-big{grid-row:span 2;grid-column:span 2}
+.shape-wide{grid-column:span 2}
 .gallery-card{margin:0;min-width:0}
 .gallery-open{display:block;width:100%;padding:0;border:0;background:none;border-radius:6px;overflow:hidden;position:relative;color:inherit;text-align:left}
-.gallery-card .ph{border-radius:6px;aspect-ratio:auto!important;height:134px}
+.gallery-track .gallery-open{height:100%}
+.gallery-card .ph{border-radius:6px}
+.gallery-track .gallery-card .ph{aspect-ratio:auto!important;height:100%}
 .gallery-card figcaption{padding:8px 2px 0}
+/* i mosaikken ligger billedteksten som overlay nederst på billedet */
+.gallery-track .gallery-card figcaption{position:absolute;left:0;right:0;bottom:0;padding:28px 10px 8px;background:linear-gradient(transparent,#020a12e6 80%);border-radius:0 0 6px 6px;pointer-events:none}
+.gallery-track .gallery-card strong{font-size:13px;line-height:1.2}
+.gallery-track .gallery-card small{font-size:11.5px;line-height:1.25}
+.gallery-track .shape-small small{display:none}
 .gallery-card strong,.gallery-card small{display:block}
 .gallery-card strong{font-size:14px}
 .gallery-card small{color:#c2d0db;font-size:12px}
@@ -192,8 +203,11 @@ a:hover>.corners::before,a:hover>.corners::after,.gallery-card:hover .corners::b
 .filter-btn{border:1px solid #ffffff55;background:transparent;color:#fff;padding:9px 18px;border-radius:999px;font-weight:700;font-size:14px;min-height:44px;transition:background .2s,border-color .2s}
 .filter-btn:hover{border-color:#fff}
 .filter-btn[aria-pressed=true]{background:var(--blue);border-color:var(--blue)}
-.gallery-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
-.gallery-grid .gallery-card .ph{height:auto;aspect-ratio:4/3!important}
+/* Gallerisiden: murstens-layout, hvor hvert billede vises i sit eget format */
+.gallery-grid{column-count:4;column-gap:14px}
+.gallery-grid .gallery-card{display:inline-block;width:100%;margin:0 0 14px;break-inside:avoid}
+.gallery-grid .gallery-card[hidden]{display:none}
+.gallery-grid .gallery-card .ph{height:auto}
 .gallery-note{color:#aab8c7;font-size:13px;margin:0 0 18px}
 .page-gallery{padding-top:50px;min-height:60vh}
 .lightbox{border:0;padding:0;background:transparent;max-width:min(96vw,1100px);width:100%;color:#fff}
@@ -360,7 +374,6 @@ a:hover>.corners::before,a:hover>.corners::after,.gallery-card:hover .corners::b
   .header-actions{margin-left:auto}
   .product-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
   .product-grid.wide{grid-template-columns:repeat(3,minmax(0,1fr))}
-  .gallery-track .gallery-card{flex-basis:calc((100% - 36px)/4)}
   .review-card{flex-basis:calc((100% - 24px)/3)}
   .why-layout{grid-template-columns:1fr}
   .services-layout{grid-template-columns:1fr}
@@ -375,8 +388,8 @@ a:hover>.corners::before,a:hover>.corners::after,.gallery-card:hover .corners::b
   .benefit-grid>div{border:0;padding:0}
   .steps{grid-template-columns:repeat(2,1fr)}
   .steps::before{display:none}
-  .gallery-track .gallery-card{flex-basis:calc((100% - 24px)/3)}
-  .gallery-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .gallery-track{--u:clamp(100px,13vw,130px)}
+  .gallery-grid{column-count:3}
   .services-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
   .product-layout{grid-template-columns:1fr;gap:26px}
   .product-section.alt .product-media{order:0}
@@ -409,8 +422,9 @@ a:hover>.corners::before,a:hover>.corners::after,.gallery-card:hover .corners::b
   .why-grid article{padding:14px 10px;gap:8px}
   .why-grid article>.ic{width:24px;height:24px}
   .steps{grid-template-columns:1fr}
-  .gallery-track .gallery-card{flex-basis:78%}
-  .gallery-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .gallery-track{--u:clamp(104px,30vw,130px)}
+  .gallery-grid{column-count:2;column-gap:10px}
+  .gallery-grid .gallery-card{margin-bottom:10px}
   .round-arrow{display:none}
   .services-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
   .service-card .ph{height:125px}
@@ -430,7 +444,6 @@ a:hover>.corners::before,a:hover>.corners::after,.gallery-card:hover .corners::b
 @media(max-width:360px){
   .product-grid,.product-grid.wide,.services-grid{grid-template-columns:1fr}
   .why-grid{grid-template-columns:1fr}
-  .gallery-track .gallery-card{flex-basis:85%}
 }
 @media(prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}

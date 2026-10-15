@@ -80,11 +80,11 @@
     $$('.a-el').forEach(el => observer.observe(el));
     undo.push(() => observer.disconnect());
 
-    // Sikkerhedsnet: elementer, der delvist er i billedet, men ikke når observatørens grænse (fx nederst på siden
-    // eller på korte sider), vises, når scrollingen har hvilet et øjeblik – og senest 1,2 sek. efter indlæsning.
+    // Sikkerhedsnet: elementer, der er i billedet (eller sprunget over ved hurtig scroll), men ikke nåede observatørens grænse
+    // (fx nederst på siden eller på korte sider), vises, når scrollingen har hvilet et øjeblik – og senest 1,2 sek. efter indlæsning.
     const sweep = () => $$('.a-el:not(.a-in)').forEach(el => {
       const rect = el.getBoundingClientRect();
-      if (rect.height && rect.bottom > 1 && rect.top < window.innerHeight - 1) el.classList.add('a-in');
+      if (rect.height && rect.top < window.innerHeight - 1) el.classList.add('a-in');   // i billedet eller allerede rullet forbi
     });
     let sweepTimer = 0;
     const scheduleSweep = (delay = 220) => { clearTimeout(sweepTimer); sweepTimer = setTimeout(sweep, delay); };
@@ -134,7 +134,9 @@
     if (!first) return;
     first.classList.add('hero-slide', 'is-active');
     // Kun rigtige projekter (ikke markeret som eksempel) indgår i billedskiftet
-    const projects = (window.GALLERY_ITEMS || []).filter(item => !item.example && item.src).slice(0, 4);
+    const real = (window.GALLERY_ITEMS || []).filter(item => !item.example && item.src);
+    const flagged = real.filter(item => item.hero);   // "hero: true" i gallery-data.js vælger billederne; ellers de første 4
+    const projects = (flagged.length ? flagged : real).slice(0, 4);
     if (!projects.length) return;
     const slides = [{img: first, label: ''}];
     projects.forEach(item => {
@@ -217,7 +219,7 @@
     const add = (selector, speed, mode) => $$(selector).forEach(el => { if (!el.closest('.gallery-track')) layers.push({el, speed, mode, ref: mode === 'center' ? el.parentElement : el, visible: mode === 'scroll'}); });
     add('.hero-media', 0.2, 'scroll');
     add('.page-head-bg', 0.16, 'scroll');
-    add('.service-card .ph img, .product-media .ph img, .gallery-grid .ph img', 1, 'center');
+    add('.service-card .ph img, .product-media .ph img', 1, 'center');
     layers.filter(layer => layer.mode === 'center').forEach(layer => layer.el.setAttribute('data-par', ''));
     const layerObserver = new IntersectionObserver(entries => entries.forEach(entry => {
       const layer = layers.find(item => item.ref === entry.target);
