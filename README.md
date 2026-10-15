@@ -4,7 +4,7 @@ Almindelige HTML-filer (HTML, CSS, JavaScript). Ingen framework og ingen build-p
 
 ## Filer
 - **Sider:** `index.html` (forside), `produkter.html`, produktsider (`facadeskilte.html`, `indendoers-skilte.html`, `bildekoration.html`, `vinduesfolie.html`, `storformatprint.html`, `reklame-og-print.html`, `lysskilte.html`, `3d-bogstaver.html`, `pyloner-og-standere.html`, `messer-og-events.html`, `specialloesninger.html`), `services.html`, `galleri.html`, `om-os.html`, `kontakt.html`, `privatlivspolitik.html`, `handelsbetingelser.html`, `cookies.html`
-- `style.css` (design), `script.js` (funktioner og indstillinger), `gallery-data.js` (galleriets billeder)
+- `style.css` (design), `script.js` (funktioner og indstillinger), `gallery-data.js` (galleriets billeder), `animations.css` og `animations.js` (alle animationer)
 - `assets/` (logo `logo-skilton.png` til lys baggrund, `logo-skilton-hvid.png` til mørk baggrund/footer, favicon, ikoner og reserve-illustrationer), `assets/gallery/` (dine egne galleribilleder)
 
 ## Upload
@@ -22,6 +22,12 @@ Upload alle filer og mapperne `assets/` til dit webhotel (typisk `public_html`),
 Formularen kan sende på to måder (indstilles øverst i `script.js`):
 1. **Rigtig afsendelse (anbefalet):** opret en formular hos fx Formspree og indsæt adressen i `formEndpoint`. Så sendes forespørgslen direkte, med vedhæftede filer, hvis abonnementet understøtter filer.
 2. **Uden modtager (nu):** formularen åbner kundens mailprogram med en færdig mail til `contactEmail` (nu `mohidawanski@gmail.com`; skift til firmamailen før lancering). Filer kan ikke vedhæftes automatisk, så kunden bliver bedt om at vedhæfte dem i mailen.
+
+## Animationer
+Alle animationer ligger i `animations.css` og `animations.js` og lægger sig oven på designet (ingen bibliotek, ingen build). De er slået fra for besøgende, der har valgt "reducer bevægelse" i deres enhed, og siden virker uændret uden dem.
+- **Forsiden:** indlæsningsskærm (kun første besøg i en session), overskrift der kommer frem ord for ord, lysglød på "STYRKER DIN", billedskift i hero mellem jeres rigtige projekter (fra `gallery-data.js`, de billeder der **ikke** har `example: true`), lys der følger musen, parallax og skiftende zoom.
+- **Hele siden:** elementer glider/zoomer/afsløres ved scroll, fremdriftslinje øverst, understregning i menuen, animerede menuer, knapper med glød, klik-bølge og magnetisk hover (kun mus), 3D-tilt på produkt- og servicekort (kun mus), animeret FAQ, animeret galleri og lightbox (forrige/næste, piletaster, swipe), animerede stjerner i anmeldelser, formular med fokuseffekter, indlæsning, succes og fejl, samt bløde sideovergange.
+- **Slå alt fra:** fjern linjen med `animations.css` og linjen med `animations.js` fra siderne (eller slet de to filer og linjerne). **Slå kun billedskiftet fra:** sæt `example: true` på alle galleribilleder, eller fjern billeder i `gallery-data.js`.
 
 ## Logo
 Logoet er `assets/logo-skilton.png` (header) og `assets/logo-skilton-hvid.png` (footer, hvid skrift til den mørke baggrund). Begge har gennemsigtig baggrund. Skal logoet skiftes igen, erstattes de to filer (samme filnavne, samme højde-til-bredde-forhold), og `assets/favicon-skilton.png` (browserfane-ikon), `assets/apple-touch-icon.png` (ikon på iPhone-startskærm) og `assets/logo-ikon-hvid.png` (svagt ikon i footeren) opdateres.

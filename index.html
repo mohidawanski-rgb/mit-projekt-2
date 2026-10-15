@@ -12,10 +12,14 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="animations.css">
+<script>(function(){var h=document.documentElement;try{if(matchMedia('(prefers-reduced-motion: reduce)').matches||!('IntersectionObserver' in window))return;h.classList.add('anim');try{if(sessionStorage.getItem('sk-l')){h.classList.add('no-loader')}else{sessionStorage.setItem('sk-l','1');h.classList.add('has-loader')}}catch(e){h.classList.add('has-loader')}}catch(e){}})();</script>
 <script src="gallery-data.js"></script>
 <script src="script.js" defer></script>
+<script src="animations.js" defer></script>
 </head>
 <body>
+<div class="page-loader" aria-hidden="true"><div class="page-loader-inner"><img src="assets/logo-skilton-hvid.png" alt="" width="1200" height="344"><i></i></div></div>
 <a class="skip-link" href="#main">Spring til indhold</a>
 <!-- ===== HEADER (samme på alle sider) ===== -->
 <header class="site-header" id="top"><div class="container header-inner">

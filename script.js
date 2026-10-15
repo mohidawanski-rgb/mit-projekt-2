@@ -39,17 +39,25 @@ const menuToggle = $('.menu-toggle');
 const mobileNav = $('#mobile-nav');
 const searchToggle = $('.search-toggle');
 const searchPanel = $('#search-panel');
+// Viser/skjuler et panel. Er animationer slået til, får panelet et kort lukke-forløb, før det skjules.
+function setPanel(panel, open) {
+  clearTimeout(panel._closeTimer);
+  if (open) { panel.classList.remove('closing'); panel.hidden = false; return; }
+  if (panel.hidden || !document.documentElement.classList.contains('anim')) { panel.hidden = true; return; }
+  panel.classList.add('closing');
+  panel._closeTimer = setTimeout(() => { panel.hidden = true; panel.classList.remove('closing'); }, 210);
+}
 function setMenu(open) {
   if (!menuToggle || !mobileNav) return;
   menuToggle.setAttribute('aria-expanded', String(open));
   menuToggle.setAttribute('aria-label', open ? 'Luk menu' : 'Åbn menu');
-  mobileNav.hidden = !open;
+  setPanel(mobileNav, open);
   if (open) setSearch(false);
 }
 function setSearch(open) {
   if (!searchToggle || !searchPanel) return;
   searchToggle.setAttribute('aria-expanded', String(open));
-  searchPanel.hidden = !open;
+  setPanel(searchPanel, open);
   if (open) { setMenu(false); $('#site-search').focus(); }
 }
 if (menuToggle) {
@@ -57,7 +65,7 @@ if (menuToggle) {
   $$('a', mobileNav).forEach(link => link.addEventListener('click', () => setMenu(false)));
 }
 if (searchToggle) {
-  searchToggle.addEventListener('click', () => setSearch(searchPanel.hidden));
+  searchToggle.addEventListener('click', () => setSearch(searchToggle.getAttribute('aria-expanded') !== 'true'));
   // Søgeindeks: sider, produkter og services
   // [navn, adresse, type, søgeord]
   const searchIndex = [
@@ -163,7 +171,7 @@ setupReveal();
 /* ---------- FAQ: kun ét spørgsmål åbent ad gangen ---------- */
 const faqItems = $$('.faq-list details');
 faqItems.forEach(item => item.addEventListener('toggle', () => {
-  if (item.open) faqItems.forEach(other => { if (other !== item) other.open = false; });
+  if (item.open) faqItems.forEach(other => { if (other !== item && !other.dataset.closing) other.open = false; });
 }));
 
 /* ==========================================================================
@@ -202,27 +210,68 @@ function createGalleryCard(item) {
   sub.textContent = item.example ? `${what} · eksempel` : what;
   caption.append(title, sub);
   figure.append(button, caption);
-  button.addEventListener('click', () => openLightbox(item));
+  figure._item = item;
+  button.addEventListener('click', () => openLightbox(item, figure));
   return figure;
 }
 
-function openLightbox(item) {
+let lightboxList = [];
+let lightboxIndex = 0;
+function openLightbox(item, card) {
   if (!lightbox) {
     lightbox = document.createElement('dialog');
     lightbox.className = 'lightbox';
     lightbox.setAttribute('aria-label', 'Forstørret billede');
-    lightbox.innerHTML = '<button type="button" class="lightbox-close" aria-label="Luk billede"><svg class="ic" aria-hidden="true"><use href="assets/icons.svg#i-close"/></svg></button><figure><img alt=""><figcaption></figcaption></figure>';
+    const icon = name => `<svg class="ic" aria-hidden="true"><use href="assets/icons.svg#i-${name}"/></svg>`;
+    lightbox.innerHTML = `<button type="button" class="lightbox-close" aria-label="Luk billede">${icon('close')}</button>`
+      + `<button type="button" class="lightbox-nav prev" aria-label="Forrige billede">${icon('left')}</button>`
+      + `<button type="button" class="lightbox-nav next" aria-label="Næste billede">${icon('right')}</button>`
+      + '<figure><img alt=""><figcaption></figcaption><p class="lightbox-count" aria-live="polite"></p></figure>';
     document.body.append(lightbox);
     $('.lightbox-close', lightbox).addEventListener('click', () => lightbox.close());
+    $('.lightbox-nav.prev', lightbox).addEventListener('click', () => showLightbox(lightboxIndex - 1, -1));
+    $('.lightbox-nav.next', lightbox).addEventListener('click', () => showLightbox(lightboxIndex + 1, 1));
     lightbox.addEventListener('click', event => { if (event.target === lightbox) lightbox.close(); });
+    lightbox.addEventListener('keydown', event => {
+      if (event.key === 'ArrowLeft') { event.preventDefault(); showLightbox(lightboxIndex - 1, -1); }
+      if (event.key === 'ArrowRight') { event.preventDefault(); showLightbox(lightboxIndex + 1, 1); }
+    });
+    let touchStartX = null;
+    const figure = $('figure', lightbox);
+    figure.addEventListener('touchstart', event => { touchStartX = event.touches[0].clientX; }, {passive: true});
+    figure.addEventListener('touchend', event => {
+      if (touchStartX === null) return;
+      const difference = touchStartX - event.changedTouches[0].clientX;
+      touchStartX = null;
+      if (Math.abs(difference) > 45) showLightbox(lightboxIndex + (difference > 0 ? 1 : -1), difference > 0 ? 1 : -1);
+    }, {passive: true});
   }
+  // Billederne, der kan bladres imellem: de synlige kort i samme galleri (respekterer filteret)
+  const holder = card && card.closest('#gallery-track, #gallery-grid');
+  lightboxList = holder ? $$('.gallery-card', holder).filter(c => !c.hidden && c._item).map(c => c._item) : [item];
+  if (!lightboxList.includes(item)) lightboxList = [item];
+  if (typeof lightbox.showModal === 'function' && !lightbox.open) lightbox.showModal();
+  showLightbox(lightboxList.indexOf(item), 0);
+}
+
+function showLightbox(index, direction) {
+  const count = lightboxList.length;
+  lightboxIndex = (index + count) % count;
+  const item = lightboxList[lightboxIndex];
   const img = $('img', lightbox);
   const illustration = `assets/img/${categoryFallback[item.category] || 'facade'}.svg`;
   const chain = [item.src.replace('w=800', 'w=1600'), illustration];
   img.onerror = () => { const next = chain.shift(); if (next) img.src = next; else img.onerror = null; };
   img.src = item.local || chain.shift(); img.alt = item.alt || item.title;
   $('figcaption', lightbox).textContent = item.example ? `${item.title} – ${item.type || ''} (eksempelbillede, ikke et udført projekt)` : `${item.title} – ${item.type || ''}`;
-  if (typeof lightbox.showModal === 'function') lightbox.showModal();
+  $$('.lightbox-nav', lightbox).forEach(button => { button.hidden = count < 2; });
+  $('.lightbox-count', lightbox).textContent = count > 1 ? `${lightboxIndex + 1} / ${count}` : '';
+  const figure = $('figure', lightbox);
+  figure.classList.remove('slide-next', 'slide-prev');
+  if (direction && document.documentElement.classList.contains('anim')) {
+    void figure.offsetWidth;
+    figure.classList.add(direction > 0 ? 'slide-next' : 'slide-prev');
+  }
 }
 
 // Karrusel på forsiden
@@ -286,7 +335,13 @@ function createReviewCard(review, hidden) {
   const stars = document.createElement('div'); stars.className = 'stars';
   stars.setAttribute('role', 'img');
   stars.setAttribute('aria-label', `${review.stars} ud af 5 stjerner`);
-  stars.textContent = '★'.repeat(review.stars) + '☆'.repeat(5 - review.stars);
+  for (let i = 0; i < 5; i++) {
+    const star = document.createElement('span');
+    star.className = i < review.stars ? 'star' : 'star off';
+    star.style.setProperty('--s', String(i));
+    star.textContent = i < review.stars ? '★' : '☆';
+    stars.append(star);
+  }
   card.append(stars);
   if (review.title && String(review.title).trim()) {
     const title = document.createElement('h3'); title.className = 'review-title'; title.textContent = String(review.title).trim();
@@ -439,7 +494,7 @@ if (quoteForm) {
   const wanted = new URLSearchParams(window.location.search).get('produkt');
   if (wanted && productSelect && [...productSelect.options].some(o => o.value === wanted)) productSelect.value = wanted;
 
-  const say = (text, kind = '') => { formStatus.textContent = text; formStatus.className = kind; };
+  const say = (text, kind = '') => { formStatus.className = ''; void formStatus.offsetWidth; formStatus.textContent = text; formStatus.className = kind; };
   const fileIcon = '<svg class="ic" aria-hidden="true"><use href="assets/icons.svg#i-check"/></svg>';
   function showFiles() {
     fileList.innerHTML = '';
@@ -485,7 +540,7 @@ if (quoteForm) {
 
     if (formEndpoint) {
       const submit = $('[type=submit]', quoteForm);
-      submit.disabled = true; say('Sender forespørgsel …');
+      submit.disabled = true; submit.classList.add('is-loading'); say('Sender forespørgsel …');
       try {
         data.set('Emne', topic || '-');
         const response = await fetch(formEndpoint, {method: 'POST', body: data, headers: {Accept: 'application/json'}});
@@ -494,7 +549,7 @@ if (quoteForm) {
         quoteForm.reset(); showFiles();
       } catch (error) {
         say('Der opstod en fejl. Prøv igen, eller skriv til os på e-mail.', 'err');
-      } finally { submit.disabled = false; }
+      } finally { submit.disabled = false; submit.classList.remove('is-loading'); }
       return;
     }
 
